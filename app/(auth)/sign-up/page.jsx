@@ -1,51 +1,46 @@
-
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Lock, Mail, User } from "lucide-react"
-import { authClient } from "@/lib/auth-client"
 
 import { Button } from "@/components/ui/button"
+import { authClient } from "@/lib/auth-client"
 
 export default function SignUpPage() {
+  const router = useRouter()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [photoURL, setPhotoURL] = useState("")
   const [password, setPassword] = useState("")
+  const [role, setRole] = useState("customer")
+  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(event) {
     event.preventDefault()
-
-    // Collect the form data
-    const formData = { name, email, photoURL, password }
-    console.log("Sign up form data:", formData)
-
+    setError("")
     setLoading(true)
 
     try {
-      // Register the user with Better Auth
-      const { data, error } = await authClient.signUp.email({
-        name: name,
-        email: email,
-        password: password,
+      // Send the form data to Better Auth
+      const { error } = await authClient.signUp.email({
+        name,
+        email,
+        password,
         image: photoURL,
-        callbackURL: "/"
+        role,
       })
 
-      // Show error if registration fails
       if (error) {
-        console.log("Sign up failed:", error.message)
+        setError(error.message || "Something went wrong. Please try again.")
         return
       }
 
-      // Registration successful
-      console.log("Sign up successful:", data)
-
-
-    } catch (error) {
-      console.log("Something went wrong:", error.message)
+      router.push("/")
+    } catch {
+      setError("Something went wrong. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -98,7 +93,7 @@ export default function SignUpPage() {
                 id="email"
                 type="email"
                 required
-                placeholder="Enter Your Email"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 className="w-full rounded-xl border border-zinc-200 py-2.5 pr-3 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
@@ -140,7 +135,6 @@ export default function SignUpPage() {
                 id="password"
                 type="password"
                 required
-                minLength={8}
                 placeholder="••••••••"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -149,12 +143,48 @@ export default function SignUpPage() {
             </div>
           </div>
 
+          <div>
+            <span className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              I am a
+            </span>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-200 py-2.5 text-sm font-medium text-zinc-700 transition-colors has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 has-[:checked]:text-rose-600 dark:border-zinc-700 dark:text-zinc-300 dark:has-[:checked]:border-rose-500 dark:has-[:checked]:bg-rose-500/10 dark:has-[:checked]:text-rose-400">
+                <input
+                  type="radio"
+                  name="role"
+                  value="customer"
+                  checked={role === "customer"}
+                  onChange={() => setRole("customer")}
+                  className="size-4 accent-rose-500"
+                />
+                Customer
+              </label>
+              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-200 py-2.5 text-sm font-medium text-zinc-700 transition-colors has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 has-[:checked]:text-rose-600 dark:border-zinc-700 dark:text-zinc-300 dark:has-[:checked]:border-rose-500 dark:has-[:checked]:bg-rose-500/10 dark:has-[:checked]:text-rose-400">
+                <input
+                  type="radio"
+                  name="role"
+                  value="admin"
+                  checked={role === "admin"}
+                  onChange={() => setRole("admin")}
+                  className="size-4 accent-rose-500"
+                />
+                Admin
+              </label>
+            </div>
+          </div>
+
+          {error && (
+            <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-400">
+              {error}
+            </p>
+          )}
+
           <Button
             type="submit"
             disabled={loading}
             className="w-full rounded-full bg-rose-500 py-2.5 text-sm text-white hover:bg-rose-600"
           >
-            {loading ? "Creating Account..." : "Register"}
+            {loading ? "Creating account..." : "Register"}
           </Button>
         </form>
 

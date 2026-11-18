@@ -10,14 +10,16 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  user: {
-    additionalFields: {
-      role: {
-        type: ['admin', 'customer' ],
-        input: false
-      }
+ user: {
+  additionalFields: {
+    role: {
+      type: "string",
+      input: false,          // ← মূল পরিবর্তন: ক্লায়েন্টকে এটি সেট করতে দেবেন না
+      defaultValue: "customer", // ← ডিফল্ট মান দিন
+      required: false,
     }
-  },
+  }
+},
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
