@@ -14,7 +14,7 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("")
   const [photoURL, setPhotoURL] = useState("")
   const [password, setPassword] = useState("")
-  const [role, setRole] = useState("customer")
+  const role = "customer" // locked — admins are never created here
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -30,7 +30,6 @@ export default function SignUpPage() {
         email,
         password,
         image: photoURL,
-        role,
       })
 
       if (error) {
@@ -38,7 +37,7 @@ export default function SignUpPage() {
         return
       }
 
-      router.push("/")
+      router.push("/sign-in")
     } catch {
       setError("Something went wrong. Please try again.")
     } finally {
@@ -144,32 +143,22 @@ export default function SignUpPage() {
           </div>
 
           <div>
-            <span className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              I am a
-            </span>
-            <div className="grid grid-cols-2 gap-3">
-              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-200 py-2.5 text-sm font-medium text-zinc-700 transition-colors has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 has-[:checked]:text-rose-600 dark:border-zinc-700 dark:text-zinc-300 dark:has-[:checked]:border-rose-500 dark:has-[:checked]:bg-rose-500/10 dark:has-[:checked]:text-rose-400">
-                <input
-                  type="radio"
-                  name="role"
-                  value="customer"
-                  checked={role === "customer"}
-                  onChange={() => setRole("customer")}
-                  className="size-4 accent-rose-500"
-                />
-                Customer
-              </label>
-              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-200 py-2.5 text-sm font-medium text-zinc-700 transition-colors has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 has-[:checked]:text-rose-600 dark:border-zinc-700 dark:text-zinc-300 dark:has-[:checked]:border-rose-500 dark:has-[:checked]:bg-rose-500/10 dark:has-[:checked]:text-rose-400">
-                <input
-                  type="radio"
-                  name="role"
-                  value="admin"
-                  checked={role === "admin"}
-                  onChange={() => setRole("admin")}
-                  className="size-4 accent-rose-500"
-                />
-                Admin
-              </label>
+            <label
+              htmlFor="role"
+              className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            >
+              Account Type
+            </label>
+            <div className="relative">
+              <User className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
+              <input
+                id="role"
+                type="text"
+                value={role}
+                readOnly
+                disabled
+                className="w-full cursor-not-allowed rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 pr-3 pl-9 text-sm text-zinc-500 dark:border-zinc-700 dark:bg-neutral-950 dark:text-zinc-400"
+              />
             </div>
           </div>
 

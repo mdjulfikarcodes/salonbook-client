@@ -4,8 +4,9 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react"
+import {signOut} from "@/lib/auth-client"
 
-import { authClient } from "@/lib/auth-client"
+// import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
 export type NavbarUser = {
@@ -47,10 +48,8 @@ export default function ProfileDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  async function handleLogout() {
-    setOpen(false)
-    await authClient.signOut()
-    router.push("/")
+   const handleSignOut = async() => {
+    await signOut()
   }
 
   return (
@@ -99,11 +98,11 @@ export default function ProfileDropdown({
               Dashboard
             </Link>
             <button
-              onClick={handleLogout}
+              onClick={handleSignOut}
               className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-zinc-600 transition-colors hover:bg-rose-50 hover:text-rose-600 dark:text-zinc-300 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
             >
               <LogOut className="size-4" />
-              Logout
+              Sign Out
             </button>
           </div>
         </div>

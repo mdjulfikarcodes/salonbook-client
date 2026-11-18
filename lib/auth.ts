@@ -14,8 +14,8 @@ export const auth = betterAuth({
   additionalFields: {
     role: {
       type: "string",
-      input: false,          // ← মূল পরিবর্তন: ক্লায়েন্টকে এটি সেট করতে দেবেন না
-      defaultValue: "customer", // ← ডিফল্ট মান দিন
+      input: false,
+      defaultValue: "customer",
       required: false,
     }
   }

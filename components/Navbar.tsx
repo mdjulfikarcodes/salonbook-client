@@ -19,6 +19,8 @@ export default function Navbar() {
   const { data: session, isPending } = useSession()
   const user: NavbarUser | undefined = session?.user
 
+  console.log('user session in navbar', session)
+
   const dashboardHref =
     user?.role === "admin" ? "/dashboard/admin" : "/dashboard/customer"
 
@@ -29,6 +31,8 @@ export default function Navbar() {
   function isActive(href: string) {
     return href === "/" ? pathname === "/" : pathname.startsWith(href)
   }
+
+ 
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/95 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95">
