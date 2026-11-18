@@ -43,8 +43,6 @@ export default function SignUpPage() {
       // Registration successful
       console.log("Sign up successful:", data)
 
-      // Check authentication token
-      console.log("Session token:", data?.token)
 
     } catch (error) {
       console.log("Something went wrong:", error.message)

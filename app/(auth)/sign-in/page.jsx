@@ -1,23 +1,58 @@
+
 "use client"
 
 import Link from "next/link"
 import { useState } from "react"
 import { Lock, Mail } from "lucide-react"
+import { authClient } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 
 export default function SignInPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(event) {
+  const router = useRouter()
+
+  async function handleSubmit(event) {
     event.preventDefault()
 
     // Collect the form data
     const formData = { email, password }
     console.log("Sign in form data:", formData)
 
-    // Add your login logic here later
+    setLoading(true)
+
+    try {
+      // Sign in the user with Better Auth
+      const { data, error } = await authClient.signIn.email({
+        email: email,
+        password: password,
+        rememberMe: true,
+        callbackURL: "/"
+      })
+
+      // Show error if login fails
+      if (error) {
+        console.log("Sign in failed:", error.message)
+        return
+      }
+
+      // Login successful
+      console.log("Sign in successful:", data)
+
+    
+
+      // Redirect to homepage
+      router.push("/")
+
+    } catch (error) {
+      console.log("Something went wrong:", error.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -85,9 +120,10 @@ export default function SignInPage() {
 
           <Button
             type="submit"
+            disabled={loading}
             className="w-full rounded-full bg-rose-500 py-2.5 text-sm text-white hover:bg-rose-600"
           >
-            Login
+            {loading ? "Signing In..." : "Login"}
           </Button>
         </form>
 
