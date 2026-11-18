@@ -41,8 +41,8 @@ function XIcon({ className }: IconProps) {
 const quickLinks = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Browse Services" },
-  { href: "/signin", label: "Sign In" },
-  { href: "/signup", label: "Sign Up" },
+  { href: "/sign-in", label: "Sign In" },
+  { href: "/sign-up", label: "Sign Up" },
 ]
 
 const socials = [

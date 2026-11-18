@@ -97,14 +97,14 @@ export default function MobileMenu({
           ) : (
             <div className="mt-2 flex flex-col gap-2">
               <Link
-                href="/signin"
+                href="/sign-in"
                 onClick={() => setOpen(false)}
                 className="rounded-full border border-zinc-200 px-4 py-2 text-center text-sm font-medium text-zinc-700 transition-colors hover:border-rose-300 hover:text-rose-600 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-rose-500/40 dark:hover:text-rose-400"
               >
                 Sign In
               </Link>
               <Link
-                href="/signup"
+                href="/sign-up"
                 onClick={() => setOpen(false)}
                 className="rounded-full bg-rose-500 px-4 py-2 text-center text-sm font-medium text-white shadow-sm transition-colors hover:bg-rose-600"
               >
