@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { Lock, Mail, User } from "lucide-react"
+import { Lock, Mail, User, Eye, EyeOff } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
@@ -14,6 +14,7 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("")
   const [photoURL, setPhotoURL] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false) // ⬅️ পাসওয়ার্ড দেখার স্টেট
   const role = "customer" // locked — admins are never created here
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -132,13 +133,21 @@ export default function SignUpPage() {
               <Lock className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"} // ⬅️ ডাইনামিক টাইপ
                 required
                 placeholder="••••••••"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="w-full rounded-xl border border-zinc-200 py-2.5 pr-3 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
+                className="w-full rounded-xl border border-zinc-200 py-2.5 pr-10 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
               />
+              {/* ⬇️ Eye Icon বাটন */}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              >
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
             </div>
           </div>
 

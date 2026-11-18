@@ -38,6 +38,7 @@ const menuItemByRole: Record<"admin" | "customer", MenuItem[]> = {
         { id: "admin-users", name: "Manage Users", url: "/dashboard/admin/users", icon: Users },
         { id: "admin-transactions", name: "Transactions", url: "/dashboard/admin/transactions", icon: CreditCard },
         { id: "admin-profile", name: "My Profile", url: "/dashboard/admin/profile", icon: User },
+        // ⬅️ ডুপ্লিকেট "My Profile" লাইনটি এখান থেকে মুছে দেওয়া হয়েছে
     ],
     customer: [
         { id: "customer-overview", name: "Overview", url: "/dashboard/customer", icon: LayoutDashboard },
@@ -49,6 +50,7 @@ const menuItemByRole: Record<"admin" | "customer", MenuItem[]> = {
 export function DashboardSidebar() {
     const { data: session, isPending } = useSession();
     const role = (session?.user?.role as "admin" | "customer") || "customer";
+    
     return (
         <Sidebar>
             <SidebarHeader />
@@ -58,14 +60,14 @@ export function DashboardSidebar() {
                 <SidebarGroup>
                     <SidebarMenu>
                         {
-                            // menuItemByRole[role].map((item) => (
-                            //     <SidebarMenuItem key={item.id}>
-                            //         <SidebarMenuButton render={<a href={item.url} />}>
-                            //             <item.icon />
-                            //             <span>{item.name}</span>
-                            //         </SidebarMenuButton>
-                            //     </SidebarMenuItem>
-                            // ))
+                            menuItemByRole[role].map((item) => (
+                                <SidebarMenuItem key={item.id}>
+                                    <SidebarMenuButton render={<a href={item.url} />}>
+                                        <item.icon />
+                                        <span>{item.name}</span>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))
                         }
                     </SidebarMenu>
                 </SidebarGroup>
