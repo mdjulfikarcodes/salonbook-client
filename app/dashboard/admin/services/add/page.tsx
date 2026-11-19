@@ -61,7 +61,7 @@ export default function AddServicePage() {
   }
 
   return (
-    <div className="max-w-xl px-4 py-10">
+    <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
       <h1 className="text-2xl font-bold">Add / Update Service</h1>
       <p className="mt-1 text-sm text-muted-foreground">Fill in the service details below.</p>
 
@@ -120,7 +120,7 @@ export default function AddServicePage() {
           </p>
         )}
 
-        <Button type="submit" className="cursor-pointer" disabled={loading}>
+        <Button type="submit" className="w-full cursor-pointer" disabled={loading}>
           {loading ? "Uploading & Saving..." : "Publish Service"}
         </Button>
       </form>
