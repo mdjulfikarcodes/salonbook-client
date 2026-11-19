@@ -47,10 +47,7 @@ function ThemeHotkey() {
         return
       }
 
-      if (event.key.toLowerCase() !== "d") {
-        return
-      }
-
+      // ⬇️ এখানে event.key না থাকলে সরাসরি return করবে, যাতে এরর না আসে
       if (!event.key || event.key.toLowerCase() !== "d") {
         return
       }
