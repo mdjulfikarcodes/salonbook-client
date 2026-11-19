@@ -20,6 +20,7 @@ import {
     Users,
     CreditCard,
 } from "lucide-react"
+import Link from "next/link";
 
 
 type MenuItem = {
@@ -62,7 +63,7 @@ export function DashboardSidebar() {
                         {
                             menuItemByRole[role].map((item) => (
                                 <SidebarMenuItem key={item.id}>
-                                    <SidebarMenuButton render={<a href={item.url} />}>
+                                    <SidebarMenuButton render={<Link href={item.url} />}>
                                         <item.icon />
                                         <span>{item.name}</span>
                                     </SidebarMenuButton>

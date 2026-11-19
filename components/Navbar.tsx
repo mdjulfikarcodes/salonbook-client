@@ -19,6 +19,9 @@ export default function Navbar() {
   const { data: session, isPending } = useSession()
   const user: NavbarUser | undefined = session?.user
 
+  // The dashboard has its own SidebarTrigger header — hide the site Navbar there
+  if (pathname.startsWith("/dashboard")) return null
+
   console.log('user session in navbar', session)
 
   const dashboardHref =
