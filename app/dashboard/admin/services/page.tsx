@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { revalidatePath } from "next/cache"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -11,10 +12,12 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
-import { getServices } from "@/lib/api/services"
+import { getServices, deleteService } from "@/lib/api/services"
+
+import { DeleteServiceButton } from "@/components/DeleteServiceButton"
 
 type Service = {
-  _id: string // MongoDB থেকে আইডি _id হিসেবে আসে
+  _id: string
   name: string
   image: string
   category: string
@@ -25,6 +28,16 @@ type Service = {
 
 export default async function ManageServicesPage() {
   const services = await getServices();
+
+  async function handleDelete(formData: FormData) {
+    "use server"
+    const id = formData.get("id") as string
+    const result = await deleteService(id)
+    
+    if (result) {
+      revalidatePath("/dashboard/admin/services")
+    }
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
@@ -88,9 +101,13 @@ export default async function ManageServicesPage() {
                     >
                       Edit
                     </Link>
-                    <Button variant="destructive" size="sm">
-                      Delete
-                    </Button>
+                    
+                    
+                    <DeleteServiceButton 
+                      serviceId={service._id} 
+                      onDelete={handleDelete} 
+                    />
+
                     <Button variant="outline" size="sm">
                       {service.status === "Active" ? "Deactivate" : "Activate"}
                     </Button>
