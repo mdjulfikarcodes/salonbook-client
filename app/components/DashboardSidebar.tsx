@@ -43,7 +43,7 @@ const menuItemByRole: Record<"admin" | "customer", MenuItem[]> = {
     ],
     customer: [
         { id: "customer-overview", name: "Overview", url: "/dashboard/customer", icon: LayoutDashboard },
-        { id: "customer-appointments", name: "My Appointments", url: "/dashboard/customer/appointments", icon: CalendarDays },
+        { id: "customer-appointments", name: "My Appointments", url: "/dashboard/customer/my-appointments", icon: CalendarDays },
         { id: "customer-profile", name: "My Profile", url: "/dashboard/customer/profile", icon: User },
     ],
 }

@@ -1,24 +1,28 @@
+// The backend server address (change it if your API runs elsewhere)
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-// ==================== Types ====================
+// Fetch all appointments for one customer from the API
+export const getCustomerAppointments = async (customerId: string) => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/appointments?customerId=${customerId}`,
+      { cache: "no-store" } // always get fresh data
+    )
 
-export interface AppointmentData {
-  serviceId: string
-  customerId?: string
-  customerName?: string
-  customerEmail?: string
-  serviceName?: string
-  servicePrice?: number
-  appointmentDate: string
-  timeSlot: string
-  message?: string
-  status?: string
-  paymentStatus?: string
+    if (!res.ok) {
+      throw new Error("Failed to load appointments")
+    }
+
+    return await res.json()
+  } catch (error) {
+    // If something goes wrong, log it and return an empty list
+    console.error("Error in getCustomerAppointments:", error)
+    return []
+  }
 }
 
-// ==================== Create Appointment ====================
-
-export const createAppointment = async (appointmentData: AppointmentData) => {
+// Create a new appointment and send it to the database
+export const createAppointment = async (appointmentData: any) => {
   try {
     const res = await fetch(`${BASE_URL}/appointments`, {
       method: "POST",
