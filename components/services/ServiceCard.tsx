@@ -23,7 +23,12 @@ export type Service = {
 }
 
 export function ServiceCard({ service }: { service: Service }) {
-  const serviceId = service._id || service.id || ""
+  
+  const serviceId = service._id || service.id;
+  if (!serviceId) {
+    console.error("Service ID is missing for:", service.name);
+    return null; 
+  }
 
   return (
     <Card className="flex flex-col overflow-hidden pt-0">
@@ -58,8 +63,9 @@ export function ServiceCard({ service }: { service: Service }) {
       </CardContent>
 
       <CardFooter>
+  
         <Link
-          href={`/services/${serviceId}`}
+          href={`/browse-services/${serviceId}`}
           className={cn(
             buttonVariants(),
             "w-full rounded-full bg-rose-500 text-white hover:bg-rose-600"

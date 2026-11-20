@@ -39,7 +39,7 @@ export default function BrowseServicesPage() {
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearch(search)
-        }, 500) // ৫০০ মিলিসেকেন্ড অপেক্ষা করবে
+        }, 500)
 
         return () => clearTimeout(timer)
     }, [search])
@@ -76,7 +76,7 @@ export default function BrowseServicesPage() {
         return () => {
             active = false
         }
-    }, [debouncedSearch, category, sort]) // ⬇️ ডিপেন্ডেন্সি অ্যারে চেঞ্জ করা হলো
+    }, [debouncedSearch, category, sort]) 
 
     return (
         <div className="w-full max-w-6xl mx-auto px-4 py-8 min-h-[80vh]">
@@ -124,7 +124,7 @@ export default function BrowseServicesPage() {
 
             {/* Results grid */}
             {loading ? (
-                // ⬇️ ২. লোডিংয়ের সময় ৬টি ডামি কার্ড (Skeleton) দেখানো হচ্ছে
+           
                 <ServiceSkeleton />
             ) : services.length === 0 ? (
                 <div className="flex min-h-[40vh] items-center justify-center">
