@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, type FormEvent } from "react"
+import { useRouter } from "next/navigation" 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -16,17 +17,19 @@ import { createService } from "@/lib/actions/services"
 const categories = ["Haircut", "Coloring", "Facial", "Makeup", "Spa", "Manicure", "Pedicure"]
 
 export default function AddServicePage() {
+  const router = useRouter(); 
+  
   const [name, setName] = useState("")
   const [category, setCategory] = useState("")
   const [description, setDescription] = useState("")
   const [price, setPrice] = useState("")
   const [duration, setDuration] = useState("")
-  const [image, setImage] = useState<File | null>(null) // ⬅️ File স্টেট
+  const [image, setImage] = useState<File | null>(null)
   const [status, setStatus] = useState("Active")
   const [showSuccess, setShowSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setLoading(true)
     setShowSuccess(false)
@@ -41,20 +44,22 @@ export default function AddServicePage() {
     if (image) formData.append("image", image)
 
     try {
+      console.log("1. Form Submit Start. Sending data to backend...")
+      
       const result = await createService(formData)
       
+      // ⬇️ এই লগটি দেখেই তুমি বুঝবে সার্ভার কী রেসপন্স দিচ্ছে
+      console.log("2. Response from createService:", result)
+
       if (result) {
-        setShowSuccess(true)
-        setName("")
-        setCategory("")
-        setDescription("")
-        setPrice("")
-        setDuration("")
-        setImage(null) // ফাইল রিসেট
-        setStatus("Active")
+        console.log("3. Success! Redirecting to Manage Services...")
+        router.push("/dashboard/admin/services") 
+        router.refresh()
+      } else {
+        console.log("3. Failed! Result is null. Backend might be throwing an error.")
       }
     } catch (error) {
-      console.error("Failed to create service", error)
+      console.error("Backend fetch error:", error)
     } finally {
       setLoading(false)
     }
@@ -97,7 +102,6 @@ export default function AddServicePage() {
           </div>
         </div>
 
-        {/* ⬇️ এখানে ইমেজ ফাইল আপলোড */}
         <div>
           <label htmlFor="image" className="mb-1 block text-sm font-medium">Service Image (Upload)</label>
           <Input id="image" type="file" className="cursor-pointer" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] || null)} />
@@ -113,12 +117,6 @@ export default function AddServicePage() {
             </SelectContent>
           </Select>
         </div>
-
-        {showSuccess && (
-          <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-500/10 dark:text-green-400">
-            Service saved successfully!
-          </p>
-        )}
 
         <Button type="submit" className="w-full cursor-pointer" disabled={loading}>
           {loading ? "Uploading & Saving..." : "Publish Service"}

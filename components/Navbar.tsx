@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 
 const baseLinks = [
   { href: "/", label: "Home" },
-  { href: "/services", label: "Browse Services" },
+  { href: "/browse-services", label: "Browse Services" },
 ]
 
 export default function Navbar() {

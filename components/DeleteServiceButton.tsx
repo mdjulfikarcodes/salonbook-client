@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { toast } from "@/components/ui/toast"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,11 +22,10 @@ type Props = {
 export function DeleteServiceButton({ serviceId, onDelete }: Props) {
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm">
-          Delete
-        </Button>
+      <AlertDialogTrigger className="inline-flex items-center justify-center rounded-md bg-red-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 transition-colors">
+        Delete
       </AlertDialogTrigger>
+      
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -36,10 +36,18 @@ export function DeleteServiceButton({ serviceId, onDelete }: Props) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-     
-          <form action={onDelete}>
+          
+          <form 
+            action={async (formData) => {
+              await onDelete(formData);
+              toast.add({
+                title: "Service deleted",
+                description: "The service has been removed successfully.",
+              });
+            }}
+          >
             <input type="hidden" name="id" value={serviceId} />
-            <AlertDialogAction type="submit" className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction type="submit" className="bg-red-600 hover:bg-red-700 ">
               Delete
             </AlertDialogAction>
           </form>
