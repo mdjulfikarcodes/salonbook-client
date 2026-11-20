@@ -4,19 +4,23 @@ import Link from "next/link"
 import { useState } from "react"
 import { Lock, Mail, Eye, EyeOff } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 
 export default function SignInPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false) // ⬅️ পাসওয়ার্ড দেখার স্টেট
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const router = useRouter()
+  const searchParams = useSearchParams();
+  
+  // ⬇️ URL থেকে redirectTo নেওয়া হচ্ছে (না থাকলে হোম পেজ "/")
+  const redirectTo = searchParams.get("redirectTo") ?? "/"
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     // Collect the form data
@@ -31,7 +35,7 @@ export default function SignInPage() {
         email: email,
         password: password,
         rememberMe: true,
-        callbackURL: "/"
+        callbackURL: redirectTo,
       })
 
       // Show error if login fails
@@ -43,10 +47,11 @@ export default function SignInPage() {
       // Login successful
       console.log("Sign in successful:", data)
 
-      // Redirect to homepage
-      router.push("/")
+      // ⬇️ লগইন সফল হলে ইউজারকে তার কাঙ্ক্ষিত পেজে বা হোমপেজে পাঠাবে
+      router.push(redirectTo)
+      router.refresh() 
 
-    } catch (error) {
+    } catch (error: any) {
       console.log("Something went wrong:", error.message)
     } finally {
       setLoading(false)
@@ -98,14 +103,13 @@ export default function SignInPage() {
               <Lock className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
               <input
                 id="password"
-                type={showPassword ? "text" : "password"} // ⬅️ ডাইনামিক টাইপ
+                type={showPassword ? "text" : "password"}
                 required
                 placeholder="••••••••"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="w-full rounded-xl border border-zinc-200 py-2.5 pr-10 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
               />
-              {/* ⬇️ Eye Icon বাটন */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}

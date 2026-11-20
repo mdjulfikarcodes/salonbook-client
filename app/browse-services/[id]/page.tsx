@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select"
 import { getServiceById } from "@/lib/api/services"
 import { useSession } from "@/lib/auth-client"
+import { createAppointment } from "@/lib/actions/appointments"
 
 const timeSlots = [
   "10:00 AM", "11:00 AM", "12:00 PM",
@@ -28,12 +29,13 @@ const timeSlots = [
 export default function ServiceDetailsPage() {
   const params = useParams()
   const router = useRouter()
-  const serviceId = params?.id as string 
+  const serviceId = params?.id as string
 
   const { data: session, isPending } = useSession()
 
   const [service, setService] = useState<Service | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [date, setDate] = useState("")
   const [time, setTime] = useState("")
@@ -41,29 +43,29 @@ export default function ServiceDetailsPage() {
   const [error, setError] = useState("")
   const [showSuccess, setShowSuccess] = useState(false)
 
-  // ১. ইউজার লগইন না থাকলে সাইন-ইন পেজে রিডাইরেক্ট
+  // ১. লগইন না থাকলে sign-in এ redirect
   useEffect(() => {
     if (!isPending && !session) {
-      router.push("/sign-in")
+      router.push(`/sign-in?redirectTo=/browse-services/${serviceId}`)
     }
-  }, [session, isPending, router])
+  }, [session, isPending, router, serviceId])
 
-  // ২. সার্ভিস ফেচ করা (সেশন থাকলে তবেই ফেচ হবে)
+  // ২. সার্ভিস ডেটা ফেচ
   useEffect(() => {
     let active = true
 
     async function fetchService() {
-      if (!serviceId || !session) return; // ⬅️ সেশন না থাকলে ফেচ হবে না
+      if (!serviceId || !session) return
 
       try {
         setLoading(true)
         const data = await getServiceById(serviceId)
-        
+
         if (active) {
           if (data && !data.error && Object.keys(data).length > 0) {
-             setService(data?.service || data)
+            setService(data?.service || data)
           } else {
-             setService(null)
+            setService(null)
           }
         }
       } catch (err) {
@@ -79,9 +81,10 @@ export default function ServiceDetailsPage() {
     return () => {
       active = false
     }
-  }, [serviceId, session]) // ⬅️ session ডিপেন্ডেন্সিতে যোগ করা হলো
+  }, [serviceId, session])
 
-  function handleBooking(event: FormEvent<HTMLFormElement>) {
+  // ৩. অ্যাপয়েন্টমেন্ট সাবমিট
+  async function handleBooking(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError("")
     setShowSuccess(false)
@@ -91,16 +94,42 @@ export default function ServiceDetailsPage() {
       return
     }
 
-    const bookingData = { serviceId, date, time, message }
-    console.log("Booking data:", bookingData)
+    setIsSubmitting(true)
 
-    setShowSuccess(true)
-    setMessage("")
-    setTime("")
-    setDate("")
+    const appointmentData = {
+      serviceId: serviceId,
+      customerId: session?.user?.id,
+      customerName: session?.user?.name,
+      customerEmail: session?.user?.email,
+      serviceName: service?.name,
+      servicePrice: Number(service?.price),
+      appointmentDate: date,
+      timeSlot: time,
+      message: message,
+      status: "Pending",
+      paymentStatus: "Unpaid",
+    }
+
+    console.log("Sending data to database:", appointmentData)
+
+    try {
+      const result = await createAppointment(appointmentData)
+
+      if (result) {
+        setShowSuccess(true)
+        setMessage("")
+        setTime("")
+        setDate("")
+      } else {
+        setError("Failed to book appointment. Try again.")
+      }
+    } catch (err) {
+      setError("Something went wrong.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  // ⬇️ ৩. রেন্ডারের একদম শুরুতে চেক
   if (isPending) {
     return (
       <div className="w-full max-w-6xl mx-auto px-4 py-8 min-h-[70vh] flex items-center justify-center">
@@ -110,7 +139,7 @@ export default function ServiceDetailsPage() {
   }
 
   if (!session) {
-    return null; 
+    return null
   }
 
   if (loading) {
@@ -125,8 +154,8 @@ export default function ServiceDetailsPage() {
     return (
       <div className="w-full max-w-6xl mx-auto px-4 py-8 min-h-[70vh] flex items-center justify-center flex-col gap-4">
         <p className="text-center text-red-500 font-medium text-lg">Service not found or invalid ID.</p>
-        <Button onClick={() => window.location.href = "/browse-services"}>
-            Go Back to Services
+        <Button onClick={() => (window.location.href = "/browse-services")}>
+          Go Back to Services
         </Button>
       </div>
     )
@@ -182,6 +211,7 @@ export default function ServiceDetailsPage() {
                     type="date"
                     value={date}
                     onChange={(event) => setDate(event.target.value)}
+                    required
                   />
                 </div>
 
@@ -221,15 +251,16 @@ export default function ServiceDetailsPage() {
 
                 {showSuccess && (
                   <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-500/10 dark:text-green-400">
-                    Appointment requested! Check the browser console for the details.
+                    Appointment requested successfully! You can view it in your dashboard.
                   </p>
                 )}
 
                 <Button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full rounded-full bg-rose-500 text-white hover:bg-rose-600"
                 >
-                  Book Appointment
+                  {isSubmitting ? "Booking..." : "Book Appointment"}
                 </Button>
               </form>
             </div>
