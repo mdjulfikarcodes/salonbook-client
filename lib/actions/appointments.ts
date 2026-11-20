@@ -21,6 +21,30 @@ export const getCustomerAppointments = async (customerId: string) => {
   }
 }
 
+
+
+// Fetch appointment counts for a specific customer
+export const getCustomerAppointmentsCount = async (customerId: string) => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/appointments/count?customerId=${customerId}`,
+      { cache: "no-store" }
+    )
+
+    if (!res.ok) {
+      throw new Error("Failed to load appointment counts")
+    }
+
+    return await res.json()
+  } catch (error) {
+    console.error("Error in getCustomerAppointmentsCount:", error)
+    return { total: 0, pending: 0, confirmed: 0, cancelled: 0, unpaid: 0 }
+  }
+}
+
+
+
+
 // Create a new appointment and send it to the database
 export const createAppointment = async (appointmentData: any) => {
   try {

@@ -18,7 +18,8 @@ import {
 } from "@/components/ui/select"
 import { getServiceById } from "@/lib/api/services"
 import { useSession } from "@/lib/auth-client"
-import { createAppointment } from "@/lib/actions/appointments"
+// ⬇️ কাউন্ট চেক করার ফাংশনটি ইমপোর্ট করুন
+import { createAppointment, getCustomerAppointmentsCount } from "@/lib/actions/appointments"
 
 const timeSlots = [
   "10:00 AM", "11:00 AM", "12:00 PM",
@@ -83,7 +84,7 @@ export default function ServiceDetailsPage() {
     }
   }, [serviceId, session])
 
-  // ৩. অ্যাপয়েন্টমেন্ট সাবমিট
+  // ৩. অ্যাপয়েন্টমেন্ট সাবমিট (পেমেন্ট চেক সহ)
   async function handleBooking(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError("")
@@ -96,23 +97,34 @@ export default function ServiceDetailsPage() {
 
     setIsSubmitting(true)
 
-    const appointmentData = {
-      serviceId: serviceId,
-      customerId: session?.user?.id,
-      customerName: session?.user?.name,
-      customerEmail: session?.user?.email,
-      serviceName: service?.name,
-      servicePrice: Number(service?.price),
-      appointmentDate: date,
-      timeSlot: time,
-      message: message,
-      status: "Pending",
-      paymentStatus: "Unpaid",
-    }
-
-    console.log("Sending data to database:", appointmentData)
-
     try {
+    
+      const countResult = await getCustomerAppointmentsCount(session?.user?.id as string)
+
+      
+      if (countResult.total >= 1) {
+       
+        router.push('/payment') 
+        return
+      }
+
+      
+      const appointmentData = {
+        serviceId: serviceId,
+        customerId: session?.user?.id,
+        customerName: session?.user?.name,
+        customerEmail: session?.user?.email,
+        serviceName: service?.name,
+        servicePrice: Number(service?.price),
+        appointmentDate: date,
+        timeSlot: time,
+        message: message,
+        status: "Pending",
+        paymentStatus: "Unpaid",
+      }
+
+      console.log("Sending data to database:", appointmentData)
+
       const result = await createAppointment(appointmentData)
 
       if (result) {
@@ -120,6 +132,10 @@ export default function ServiceDetailsPage() {
         setMessage("")
         setTime("")
         setDate("")
+        
+        // বুকিং সফল হলে ড্যাশবোর্ডে চলে যাবে
+        router.push("/dashboard/customer/my-appointments")
+        
       } else {
         setError("Failed to book appointment. Try again.")
       }
@@ -251,7 +267,7 @@ export default function ServiceDetailsPage() {
 
                 {showSuccess && (
                   <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-500/10 dark:text-green-400">
-                    Appointment requested successfully! You can view it in your dashboard.
+                    Appointment requested successfully! Redirecting to your dashboard...
                   </p>
                 )}
 
