@@ -98,17 +98,16 @@ export default function ServiceDetailsPage() {
     setIsSubmitting(true)
 
     try {
-    
       const countResult = await getCustomerAppointmentsCount(session?.user?.id as string)
 
-      
+      // ⬇️ এখানে URL-এ ডেটা পাঠানোর ব্যবস্থা করা হলো
       if (countResult.total >= 1) {
-       
-        router.push('/payment') 
+        // এখানে আপনার সার্ভিসের দাম ও নাম প্যারামিটার হিসেবে পাঠানো হচ্ছে
+        const paymentUrl = `/payment?amount=${service?.price}&service=${encodeURIComponent(service?.name || "")}`
+        router.push(paymentUrl) 
         return
       }
 
-      
       const appointmentData = {
         serviceId: serviceId,
         customerId: session?.user?.id,
