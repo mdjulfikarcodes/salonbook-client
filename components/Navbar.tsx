@@ -22,13 +22,15 @@ export default function Navbar() {
   // The dashboard has its own SidebarTrigger header — hide the site Navbar there
   if (pathname.startsWith("/dashboard")) return null
 
-  console.log('user session in navbar', session)
-
   const dashboardHref =
     user?.role === "admin" ? "/dashboard/admin" : "/dashboard/customer"
 
+
   const links = user
-    ? [{ href: "/", label: "Home" }, { href: "/services", label: "Salon Details" }]
+    ? [
+        { href: "/", label: "Home" }, 
+        { href: "/browse-services", label: "Salon Details" } 
+      ]
     : baseLinks
 
   function isActive(href: string) {
