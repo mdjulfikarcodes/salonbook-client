@@ -63,6 +63,29 @@ export const createAppointment = async (appointmentData: any) => {
 }
 
 
+// Cancel a Pending appointment (customer action)
+export const cancelAppointment = async (id: string) => {
+  try {
+    const res = await fetch(`${BASE_URL}/appointments/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: "Cancelled" }),
+    })
+
+    if (!res.ok) {
+      throw new Error("Failed to cancel appointment")
+    }
+
+    return await res.json()
+  } catch (error) {
+    console.error("Error in cancelAppointment:", error)
+    return null
+  }
+}
+
+
 // ADMIN FUNCTIONS:
 
 // Fetch all appointments for Admin

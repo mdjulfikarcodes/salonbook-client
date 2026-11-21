@@ -1,25 +1,36 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-// ==================== Services ====================
-
+// Fetch ALL services (Active + Inactive) - no filtering here
 export const getServices = async (query?: string) => {
-    const url = query ? `${BASE_URL}/services?${query}` : `${BASE_URL}/services`;
-    const res = await fetch(url, { cache: 'no-store' })
-    return res.json()
+    const url = query ? `${BASE_URL}/services?${query}` : `${BASE_URL}/services`
+
+    try {
+        const res = await fetch(url, { cache: "no-store" })
+        if (!res.ok) throw new Error("Failed to fetch services")
+
+        const data = await res.json()
+
+        // Backend may send a plain array OR { services: [...] } OR { data: [...] }
+        if (Array.isArray(data)) return data
+        return data?.services ?? data?.data ?? []
+    } catch (error) {
+        console.error("Error in getServices:", error)
+        return []
+    }
 }
 
 export const getServiceById = async (id: string) => {
     try {
-        const res = await fetch(`${BASE_URL}/services/${id}`, { cache: 'no-store' })
+        const res = await fetch(`${BASE_URL}/services/${id}`, { cache: "no-store" })
 
         if (!res.ok) {
-            return null;
+            return null
         }
 
         return await res.json()
     } catch (error) {
-        console.error("Fetch error:", error);
-        return null;
+        console.error("Fetch error:", error)
+        return null
     }
 }
 
@@ -35,5 +46,3 @@ export const deleteService = async (id: string) => {
 
     return res.json()
 }
-
-

@@ -1,24 +1,22 @@
 "use client"
 
-import { useState, type FormEvent } from "react"
-import { useRouter } from "next/navigation" 
+import { useState, useEffect, type FormEvent } from "react"
+import { useRouter, useSearchParams } from "next/navigation" 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { createService } from "@/lib/actions/services"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { createService, updateService } from "@/lib/actions/services"
+import { getServiceById } from "@/lib/api/services" 
 
 const categories = ["Haircut", "Coloring", "Facial", "Makeup", "Spa", "Manicure", "Pedicure"]
 
-export default function AddServicePage() {
-  const router = useRouter(); 
-  
+export default function AddEditServicePage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const serviceId = searchParams.get("id")
+  const isEditMode = Boolean(serviceId)
+
   const [name, setName] = useState("")
   const [category, setCategory] = useState("")
   const [description, setDescription] = useState("")
@@ -26,13 +24,27 @@ export default function AddServicePage() {
   const [duration, setDuration] = useState("")
   const [image, setImage] = useState<File | null>(null)
   const [status, setStatus] = useState("Active")
-  const [showSuccess, setShowSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
 
-    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    async function fetchData() {
+      if (!serviceId) return
+      const data = await getServiceById(serviceId)
+      if (data) {
+        setName(data.name || "")
+        setCategory(data.category || "")
+        setDescription(data.description || "")
+        setPrice(data.price?.toString() || "")
+        setDuration(data.duration?.toString() || "")
+        setStatus(data.status || "Active")
+      }
+    }
+    fetchData()
+  }, [serviceId])
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setLoading(true)
-    setShowSuccess(false)
 
     const formData = new FormData()
     formData.append("name", name)
@@ -44,22 +56,15 @@ export default function AddServicePage() {
     if (image) formData.append("image", image)
 
     try {
-      console.log("1. Form Submit Start. Sending data to backend...")
-      
-      const result = await createService(formData)
-      
-      // ⬇️ এই লগটি দেখেই তুমি বুঝবে সার্ভার কী রেসপন্স দিচ্ছে
-      console.log("2. Response from createService:", result)
-
-      if (result) {
-        console.log("3. Success! Redirecting to Manage Services...")
-        router.push("/dashboard/admin/services") 
-        router.refresh()
+      if (isEditMode && serviceId) {
+        await updateService(serviceId, formData) 
       } else {
-        console.log("3. Failed! Result is null. Backend might be throwing an error.")
+        await createService(formData)
       }
+      router.push("/dashboard/admin/services") 
+      router.refresh()
     } catch (error) {
-      console.error("Backend fetch error:", error)
+      console.error(error)
     } finally {
       setLoading(false)
     }
@@ -67,7 +72,7 @@ export default function AddServicePage() {
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
-      <h1 className="text-2xl font-bold">Add / Update Service</h1>
+      <h1 className="text-2xl font-bold">{isEditMode ? "Update Service" : "Add New Service"}</h1>
       <p className="mt-1 text-sm text-muted-foreground">Fill in the service details below.</p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -105,6 +110,7 @@ export default function AddServicePage() {
         <div>
           <label htmlFor="image" className="mb-1 block text-sm font-medium">Service Image (Upload)</label>
           <Input id="image" type="file" className="cursor-pointer" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] || null)} />
+          {isEditMode && <p className="text-xs text-muted-foreground mt-1">Leave empty to keep the old image.</p>}
         </div>
 
         <div>
@@ -119,7 +125,7 @@ export default function AddServicePage() {
         </div>
 
         <Button type="submit" className="w-full cursor-pointer" disabled={loading}>
-          {loading ? "Uploading & Saving..." : "Publish Service"}
+          {loading ? "Saving..." : isEditMode ? "Update Service" : "Publish Service"}
         </Button>
       </form>
     </div>

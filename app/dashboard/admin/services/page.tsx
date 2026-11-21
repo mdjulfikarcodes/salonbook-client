@@ -1,130 +1,112 @@
 import Link from "next/link"
 import { revalidatePath } from "next/cache"
-
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
-import { getServices, deleteService } from "@/lib/api/services"
-
+import { getServices } from "@/lib/api/services"
+import { deleteService, updateService } from "@/lib/actions/services"
 import { DeleteServiceButton } from "@/components/DeleteServiceButton"
 
-type Service = {
-  _id: string
-  name: string
-  image: string
-  category: string
-  price: number
-  duration: number
-  status: "Active" | "Inactive"
+// Shape of one row in the table
+type ServiceRow = {
+    _id: string
+    name: string
+    price: number | string
+    status: string
 }
 
 export default async function ManageServicesPage() {
-  const services = await getServices();
+    // Fetch ALL services (Active + Inactive) - never filter here
+    const services: ServiceRow[] = await getServices()
 
-  async function handleDelete(formData: FormData) {
-    "use server"
-    const id = formData.get("id") as string
-    const result = await deleteService(id)
-    
-    if (result) {
-      revalidatePath("/dashboard/admin/services")
+    async function handleDelete(formData: FormData) {
+        "use server"
+        await deleteService(formData.get("id") as string)
+        revalidatePath("/dashboard/admin/services")
     }
-  }
 
-  return (
-    <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Manage Services</h1>
-        <Link
-          href="/dashboard/admin/services/add"
-          className={cn(buttonVariants(), "bg-rose-500 text-white hover:bg-rose-600")}
-        >
-          Add New Service
-        </Link>
-      </div>
+    // Toggle status: send only { status: newStatus }, then refresh the page
+    async function handleToggleStatus(formData: FormData) {
+        "use server"
+        const id = formData.get("id") as string
+        const currentStatus = formData.get("currentStatus") as string
+        const newStatus = currentStatus === "Active" ? "Inactive" : "Active"
 
-      <div className="mt-6 w-full overflow-x-auto rounded-lg border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Service</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Duration</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {services.map((service: Service) => (
-              <TableRow key={service._id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    {service.image ? (
-                      <img src={service.image} alt={service.name} className="w-10 h-10 rounded-full object-cover" />
-                    ) : (
-                      <span className="flex size-9 items-center justify-center rounded-md bg-rose-100 text-sm font-semibold text-rose-600">
-                        {service.name?.charAt(0)}
-                      </span>
-                    )}
-                    <span className="font-medium">{service.name}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{service.category}</TableCell>
-                <TableCell>৳{service.price}</TableCell>
-                <TableCell>{service.duration} min</TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={
-                      service.status === "Active"
-                        ? "border-green-200 bg-green-50 text-green-700"
-                        : "border-zinc-200 bg-zinc-50 text-zinc-500"
-                    }
-                  >
-                    {service.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/dashboard/admin/services/add?id=${service._id}`}
-                      className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-                    >
-                      Edit
-                    </Link>
-                    
-                    
-                    <DeleteServiceButton 
-                      serviceId={service._id} 
-                      onDelete={handleDelete} 
-                    />
+        await updateService(id, { status: newStatus })
+        revalidatePath("/dashboard/admin/services")
+    }
 
-                    <Button variant="outline" size="sm">
-                      {service.status === "Active" ? "Deactivate" : "Activate"}
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-            {services.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
-                  No services found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  )
+    return (
+        <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold">Manage Services</h1>
+                <Link href="/dashboard/admin/services/add" className={cn(buttonVariants(), "bg-rose-500 hover:bg-rose-600")}>
+                    Add New Service
+                </Link>
+            </div>
+
+            <div className="overflow-x-auto rounded-lg border">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Service</TableHead>
+                            <TableHead>Price</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {services.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={4} className="text-center text-muted-foreground">
+                                    No services found.
+                                </TableCell>
+                            </TableRow>
+                        )}
+
+                        {services.map((service) => (
+                            <TableRow key={service._id}>
+                                <TableCell className="font-medium">{service.name}</TableCell>
+                                <TableCell>৳{service.price}</TableCell>
+                                <TableCell>
+                                    <Badge
+                                        variant="outline"
+                                        className={
+                                            service.status === "Active"
+                                                ? "text-green-600 border-green-200 bg-green-50"
+                                                : "text-zinc-500 bg-zinc-50"
+                                        }
+                                    >
+                                        {service.status}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell>
+                                    <div className="flex gap-2 items-center">
+                                        <Link
+                                            href={`/dashboard/admin/services/add?id=${service._id}`}
+                                            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                                        >
+                                            Edit
+                                        </Link>
+
+                                        <DeleteServiceButton serviceId={service._id} onDelete={handleDelete} />
+
+                                        {/* Toggle form: sends id + currentStatus to the server action */}
+                                        <form action={handleToggleStatus}>
+                                            <input type="hidden" name="id" value={service._id} />
+                                            <input type="hidden" name="currentStatus" value={service.status} />
+                                            <Button variant="outline" size="sm" type="submit">
+                                                {service.status === "Active" ? "Deactivate" : "Activate"}
+                                            </Button>
+                                        </form>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+        </div>
+    )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Calendar, Clock, DollarSign } from "lucide-react"
+import { Calendar, Clock, DollarSign, XCircle } from "lucide-react"
 
 import type { Appointment } from "@/types/appointment"
 import {
@@ -11,9 +11,10 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 // ⬇️ ১. প্রয়োজনীয় ফাংশন এবং সেশন ইমপোর্ট করুন
-import { getCustomerAppointments } from "@/lib/actions/appointments"
+import { cancelAppointment, getCustomerAppointments } from "@/lib/actions/appointments"
 import { useSession } from "@/lib/auth-client"
 
 // স্ট্যাটাস অনুযায়ী ব্যাজের রঙ ঠিক করার ফাংশন
@@ -60,6 +61,21 @@ export default function MyAppointmentsPage() {
 
     fetchAppointments()
   }, [session?.user?.id]) // ইউজার লগইন হলে বা আইডি পেলে আবার ডেটা আনবে
+
+  // ⬇️ অ্যাপয়েন্টমেন্ট ক্যানসেল করার ফাংশন (শুধু Pending হলে বাটন দেখানো হয়)
+  async function handleCancel(id: string) {
+    const ok = window.confirm("Are you sure you want to cancel this appointment?")
+    if (!ok) return
+
+    const result = await cancelAppointment(id)
+
+    if (result) {
+      // সফল হলে পেজ রিলোড করে নতুন স্ট্যাটাস দেখান
+      window.location.reload()
+    } else {
+      console.error("Failed to cancel appointment")
+    }
+  }
 
   // ⬇️ ৫. লোডিং স্টেট দেখান
   if (isLoading) {
@@ -111,6 +127,20 @@ export default function MyAppointmentsPage() {
                   <Clock className="size-4" />
                   {appointment.timeSlot}
                 </p>
+
+                {/* ⬇️ শুধু Pending হলে Cancel বাটন দেখান */}
+                {appointment.status === "Pending" && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCancel(appointment._id!)}
+                    className="mt-2 w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                  >
+                    <XCircle className="mr-1 size-4" />
+                    Cancel Appointment
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))}
