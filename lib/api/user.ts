@@ -1,9 +1,20 @@
-export const getUsers = async () =>{
-    const { data: newUser, error } = await authClient.admin.createUser({
-    email: "user@example.com", // required, The email of the user.
-    password: "some-secure-password", // required, The password of the user.
-    name: "James Smith", // required, The name of the user.
-    role: "user", // A string or array of strings representing the roles to apply to the new user.
-    data: { customField: "customValue" }, // Extra fields for the user. Including custom additional fields.
-});
+import { headers } from "next/headers"
+import { auth } from "@/lib/auth"
+
+// Fetch all users (admin plugin, needs an admin session cookie)
+export const getUsers = async () => {
+    try {
+        const result = await auth.api.listUsers({
+            query: {
+                sortBy: "name",
+                sortDirection: "desc",
+            },
+            headers: await headers(),
+        })
+
+        return result.users // plain array of users
+    } catch (error) {
+        console.error("Error in getUsers:", error)
+        return []
+    }
 }
