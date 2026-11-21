@@ -21,8 +21,6 @@ export const getCustomerAppointments = async (customerId: string) => {
   }
 }
 
-
-
 // Fetch appointment counts for a specific customer
 export const getCustomerAppointmentsCount = async (customerId: string) => {
   try {
@@ -42,9 +40,6 @@ export const getCustomerAppointmentsCount = async (customerId: string) => {
   }
 }
 
-
-
-
 // Create a new appointment and send it to the database
 export const createAppointment = async (appointmentData: any) => {
   try {
@@ -63,6 +58,49 @@ export const createAppointment = async (appointmentData: any) => {
     return await res.json()
   } catch (error) {
     console.error("Error in createAppointment:", error)
+    return null
+  }
+}
+
+
+// ADMIN FUNCTIONS:
+
+// Fetch all appointments for Admin
+export const getAllAppointmentsAdmin = async () => {
+  try {
+    const res = await fetch(`${BASE_URL}/admin/appointments`, {
+      cache: "no-store",
+    })
+
+    if (!res.ok) {
+      throw new Error("Failed to load all appointments")
+    }
+
+    return await res.json()
+  } catch (error) {
+    console.error("Error in getAllAppointmentsAdmin:", error)
+    return []
+  }
+}
+
+// Update appointment status by Admin (Confirm/Cancel)
+export const updateAppointmentStatusAdmin = async (id: string, status: string) => {
+  try {
+    const res = await fetch(`${BASE_URL}/admin/appointments/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    })
+
+    if (!res.ok) {
+      throw new Error("Failed to update status")
+    }
+
+    return await res.json()
+  } catch (error) {
+    console.error("Error in updateAppointmentStatusAdmin:", error)
     return null
   }
 }
