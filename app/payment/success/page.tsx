@@ -1,34 +1,85 @@
-import { stripe } from '@/lib/stripe'
-import { redirect } from 'next/navigation'
+"use client"
 
+import { useEffect, useState, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
+import { CheckCircle, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { paymentsVerify } from "@/lib/actions/payments"
 
+function SuccessContent() {
+  const searchParams = useSearchParams()
+  const sessionId = searchParams.get("session_id")
+  
+  const [verifying, setVerifying] = useState(true)
+  const [status, setStatus] = useState<"success" | "failed">("success")
 
-export default async function PaymentSuccessPage({ searchParams }:{searchParams: Promise<{session_id?: string}>}) {
-  const { session_id } = await searchParams
+  useEffect(() => {
+    async function verifyPayment() {
+      if (!sessionId) {
+        console.log("No Session ID found in URL")
+        setVerifying(false)
+        return
+      }
 
-  if (!session_id)
-    throw new Error('Please provide a valid session_id (`cs_test_...`)')
+    
 
-  const {
-    status,
-    customer_details: { email: customerEmail }
-  } = await stripe.checkout.sessions.retrieve(session_id, {
-    expand: ['line_items', 'payment_intent']
-  })
+      try {
+        const data = await paymentsVerify(sessionId)
+   
+        
+        if (data.success) {
+          setStatus("success")
+        } else {
+          setStatus("failed")
+        }
+      } catch (error) {
+        console.error("Verification error", error)
+        setStatus("failed")
+      } finally {
+        setVerifying(false)
+      }
+    }
 
-  if (status === 'open') {
-    return redirect('/')
-  }
+    verifyPayment()
+  }, [sessionId])
 
-  if (status === 'complete') {
+  if (verifying) {
     return (
-      <section id="success">
-        <p>
-          We appreciate your business! A confirmation email will be sent to{' '}
-          {customerEmail}. If you have any questions, please email{' '}
-          <a href="mailto:orders@example.com">orders@example.com</a>.
-        </p>
-      </section>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="size-12 animate-spin text-rose-500 mb-4" />
+        <h1 className="text-xl font-semibold">Verifying your payment...</h1>
+      </div>
     )
   }
+
+  if (status === "failed") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h1 className="text-2xl font-bold text-red-500 mb-4">Payment Verification Failed</h1>
+        <Link href="/payment">
+          <Button>Try Again</Button>
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <CheckCircle className="size-20 text-green-500 mb-4" />
+      <h1 className="text-3xl font-bold mb-2">Payment Successful!</h1>
+      <p className="text-muted-foreground mb-8">Your payment has been verified and confirmed.</p>
+      <Link href="/dashboard/customer/my-appointments">
+        <Button className="bg-rose-500 hover:bg-rose-600">Go to Dashboard</Button>
+      </Link>
+    </div>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SuccessContent />
+    </Suspense>
+  )
 }
