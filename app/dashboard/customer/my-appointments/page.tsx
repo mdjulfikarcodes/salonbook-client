@@ -1,31 +1,48 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Calendar, Clock, DollarSign, XCircle } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import {
+  Calendar,
+  CalendarDays,
+  Clock,
+  CreditCard,
+  DollarSign,
+  Tag,
+  XCircle,
+} from "lucide-react"
 
 import type { Appointment } from "@/types/appointment"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-
-// ⬇️ ১. প্রয়োজনীয় ফাংশন এবং সেশন ইমপোর্ট করুন
 import { cancelAppointment, getCustomerAppointments } from "@/lib/actions/appointments"
 import { useSession } from "@/lib/auth-client"
 
-// স্ট্যাটাস অনুযায়ী ব্যাজের রঙ ঠিক করার ফাংশন
+// Appointment + the extra fields our API sends
+type MyAppointment = Appointment & {
+  serviceImage?: string
+  category?: string
+  paymentStatus?: string
+  requestedAt?: string
+}
+
+// Status badge colors
 function getStatusColor(status: Appointment["status"]) {
   if (status === "Confirmed") return "border-green-200 bg-green-50 text-green-700"
   if (status === "Pending") return "border-amber-200 bg-amber-50 text-amber-700"
   return "border-red-200 bg-red-50 text-red-700"
 }
 
-// ডেট সুন্দরভাবে দেখানোর ফাংশন
-function formatDate(date: string) {
+// Payment badge colors (green = Paid, red = Unpaid)
+function getPaymentColor(paymentStatus?: string) {
+  if (paymentStatus === "Paid") return "border-green-200 bg-green-50 text-green-700"
+  return "border-red-200 bg-red-50 text-red-600"
+}
+
+// Make the date look nice, e.g. "Nov 25, 2026"
+function formatDate(date?: string) {
+  if (!date) return "-"
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -34,35 +51,45 @@ function formatDate(date: string) {
 }
 
 export default function MyAppointmentsPage() {
-  // ⬇️ ২. ইউজারের সেশন নিন
-  const { data: session } = useSession()
-  
-  // ⬇️ ৩. ডেটা রাখার জন্য state তৈরি করুন
-  const [appointments, setAppointments] = useState<Appointment[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  // Logged-in user
+  const { data: session, isPending } = useSession()
+  const router = useRouter()
 
-  // ⬇️ ৪. পেজ লোড হলে ডেটাবেস থেকে ডেটা নিয়ে আসুন
+  // Appointments state (null = not fetched yet)
+  const [appointments, setAppointments] = useState<MyAppointment[] | null>(null)
+
+  // Fetch appointments once we know the user id
   useEffect(() => {
-    async function fetchAppointments() {
-      // যদি ইউজার লগইন না থাকে, তবে ডেটা আনবো না
-      if (!session?.user?.id) return 
+    const userId = session?.user?.id
+    if (!userId) return
 
+    let active = true
+
+    async function fetchAppointments() {
       try {
-        setIsLoading(true)
-        // API থেকে ডেটা আনুন
-        const data = await getCustomerAppointments(session.user.id)
-        setAppointments(data)
+        const data = await getCustomerAppointments(userId as string)
+        if (active) {
+          // API may send a plain array OR { appointments: [...] }
+          const list = Array.isArray(data) ? data : (data?.appointments ?? data?.data ?? [])
+          setAppointments(list)
+        }
       } catch (error) {
         console.error("Failed to fetch appointments", error)
-      } finally {
-        setIsLoading(false)
+        if (active) setAppointments([])
       }
     }
 
     fetchAppointments()
-  }, [session?.user?.id]) // ইউজার লগইন হলে বা আইডি পেলে আবার ডেটা আনবে
 
-  // ⬇️ অ্যাপয়েন্টমেন্ট ক্যানসেল করার ফাংশন (শুধু Pending হলে বাটন দেখানো হয়)
+    return () => {
+      active = false // ignore results after leaving the page
+    }
+  }, [session?.user?.id])
+
+  // Loading = session is being checked, OR user found but data not back yet
+  const isLoading = isPending || (!!session?.user?.id && appointments === null)
+
+  // Cancel a Pending appointment: confirm → API → reload
   async function handleCancel(id: string) {
     const ok = window.confirm("Are you sure you want to cancel this appointment?")
     if (!ok) return
@@ -70,21 +97,33 @@ export default function MyAppointmentsPage() {
     const result = await cancelAppointment(id)
 
     if (result) {
-      // সফল হলে পেজ রিলোড করে নতুন স্ট্যাটাস দেখান
       window.location.reload()
     } else {
       console.error("Failed to cancel appointment")
     }
   }
 
-  // ⬇️ ৫. লোডিং স্টেট দেখান
+  // Go to the Stripe payment page with the appointment details
+  function handlePay(appointment: MyAppointment) {
+    const params = new URLSearchParams({
+      amount: String(appointment.servicePrice),
+      service: appointment.serviceName,
+      id: appointment._id ?? "",
+    })
+
+    router.push(`/payment?${params.toString()}`)
+  }
+
+  // Simple loading text while fetching
   if (isLoading) {
     return (
       <div className="w-full max-w-6xl mx-auto p-4 md:p-8 flex justify-center py-20">
-        <p className="text-muted-foreground animate-pulse">Loading your appointments...</p>
+        <p className="text-muted-foreground animate-pulse">Loading...</p>
       </div>
     )
   }
+
+  const list = appointments ?? []
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
@@ -93,23 +132,47 @@ export default function MyAppointmentsPage() {
         Here are your upcoming and past bookings.
       </p>
 
-      {/* ⬇️ ৬. যদি কোনো অ্যাপয়েন্টমেন্ট না থাকে তবে মেসেজ দেখান */}
-      {appointments.length === 0 ? (
+      {/* No appointments yet */}
+      {list.length === 0 ? (
         <div className="mt-10 text-center py-10 bg-muted/30 rounded-xl border border-dashed">
           <p className="text-muted-foreground">You have no appointments booked yet.</p>
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* ⬇️ ৭. আসল ডেটা ম্যাপ করে দেখান */}
-          {appointments.map((appointment) => (
-            <Card key={appointment._id} className="pt-0 shadow-sm hover:shadow-md transition-shadow">
+          {list.map((appointment) => (
+            <Card key={appointment._id} className="pt-0 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              {/* Service image (or first letter if there is none) */}
+              {appointment.serviceImage ? (
+                <img
+                  src={appointment.serviceImage}
+                  alt={appointment.serviceName}
+                  className="h-40 w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-40 w-full items-center justify-center bg-rose-50 text-4xl font-bold text-rose-400">
+                  {appointment.serviceName?.charAt(0)}
+                </div>
+              )}
+
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
-                  <CardTitle className="text-base">
-                    {appointment.serviceName}
-                  </CardTitle>
+                  <CardTitle className="text-base">{appointment.serviceName}</CardTitle>
                   <Badge variant="outline" className={getStatusColor(appointment.status)}>
                     {appointment.status}
+                  </Badge>
+                </div>
+
+                {/* Category + payment badges */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {appointment.category && (
+                    <Badge variant="outline" className="text-zinc-600 bg-zinc-50 border-zinc-200">
+                      <Tag className="mr-1 size-3" />
+                      {appointment.category}
+                    </Badge>
+                  )}
+                  <Badge variant="outline" className={getPaymentColor(appointment.paymentStatus)}>
+                    <CreditCard className="mr-1 size-3" />
+                    {appointment.paymentStatus || "Unpaid"}
                   </Badge>
                 </div>
               </CardHeader>
@@ -127,9 +190,27 @@ export default function MyAppointmentsPage() {
                   <Clock className="size-4" />
                   {appointment.timeSlot}
                 </p>
+                <p className="flex items-center gap-2 text-muted-foreground">
+                  <CalendarDays className="size-4" />
+                  Requested: {formatDate(appointment.requestedAt)}
+                </p>
 
-                {/* ⬇️ শুধু Pending হলে Cancel বাটন দেখান */}
-                {appointment.status === "Pending" && (
+                {/* Pay Now button: only for Confirmed + Unpaid appointments */}
+                {appointment.status === "Confirmed" &&
+                  appointment.paymentStatus === "Unpaid" && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => handlePay(appointment)}
+                      className="mt-2 w-full rounded-full bg-rose-500 text-white hover:bg-rose-600"
+                    >
+                      <CreditCard className="mr-1 size-4" />
+                      Pay Now
+                    </Button>
+                  )}
+
+                {/* Cancel button: only for Pending appointments */}
+                {appointment.status === "Pending" && appointment._id && (
                   <Button
                     type="button"
                     variant="outline"

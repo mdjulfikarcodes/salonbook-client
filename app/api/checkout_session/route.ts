@@ -10,7 +10,8 @@ export async function POST(req: Request) {
     })
 
     const body = await req.json()
-    const { amount, serviceName } = body
+    // ⬇️ appointmentId রিসিভ করা হলো
+    const { amount, serviceName, appointmentId } = body
 
     const stripeSession = await stripe.checkout.sessions.create({
       line_items: [
@@ -30,6 +31,7 @@ export async function POST(req: Request) {
       
       metadata: {
         userId: session?.user?.id || "", 
+        appointmentId: appointmentId || "" // ⬇️ মেটাডেটাতে আইডি পাঠানো হলো
       },
 
       success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/payment/success?session_id={CHECKOUT_SESSION_ID}`,

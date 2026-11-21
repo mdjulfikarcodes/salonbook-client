@@ -18,8 +18,7 @@ import {
 } from "@/components/ui/select"
 import { getServiceById } from "@/lib/api/services"
 import { useSession } from "@/lib/auth-client"
-// ⬇️ কাউন্ট চেক করার ফাংশনটি ইমপোর্ট করুন
-import { createAppointment, getCustomerAppointmentsCount } from "@/lib/actions/appointments"
+import { createAppointment } from "@/lib/actions/appointments"
 
 const timeSlots = [
   "10:00 AM", "11:00 AM", "12:00 PM",
@@ -84,7 +83,7 @@ export default function ServiceDetailsPage() {
     }
   }, [serviceId, session])
 
-  // ৩. অ্যাপয়েন্টমেন্ট সাবমিট (পেমেন্ট চেক সহ)
+  // ৩. অ্যাপয়েন্টমেন্ট সাবমিট করা
   async function handleBooking(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError("")
@@ -98,16 +97,6 @@ export default function ServiceDetailsPage() {
     setIsSubmitting(true)
 
     try {
-      const countResult = await getCustomerAppointmentsCount(session?.user?.id as string)
-
-      // ⬇️ এখানে URL-এ ডেটা পাঠানোর ব্যবস্থা করা হলো
-      if (countResult.total >= 1) {
-        // এখানে আপনার সার্ভিসের দাম ও নাম প্যারামিটার হিসেবে পাঠানো হচ্ছে
-        const paymentUrl = `/payment?amount=${service?.price}&service=${encodeURIComponent(service?.name || "")}`
-        router.push(paymentUrl) 
-        return
-      }
-
       const appointmentData = {
         serviceId: serviceId,
         customerId: session?.user?.id,

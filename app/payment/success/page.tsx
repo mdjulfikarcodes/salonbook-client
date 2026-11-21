@@ -1,15 +1,15 @@
 "use client"
 
 import { useEffect, useState, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { CheckCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
 import { paymentsVerify } from "@/lib/actions/payments"
 
 function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get("session_id")
+  const router = useRouter()
   
   const [verifying, setVerifying] = useState(true)
   const [status, setStatus] = useState<"success" | "failed">("success")
@@ -17,16 +17,12 @@ function SuccessContent() {
   useEffect(() => {
     async function verifyPayment() {
       if (!sessionId) {
-        console.log("No Session ID found in URL")
         setVerifying(false)
         return
       }
 
-    
-
       try {
         const data = await paymentsVerify(sessionId)
-   
         
         if (data.success) {
           setStatus("success")
@@ -57,9 +53,7 @@ function SuccessContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <h1 className="text-2xl font-bold text-red-500 mb-4">Payment Verification Failed</h1>
-        <Link href="/payment">
-          <Button>Try Again</Button>
-        </Link>
+        <Button onClick={() => router.push("/payment")}>Try Again</Button>
       </div>
     )
   }
@@ -69,9 +63,17 @@ function SuccessContent() {
       <CheckCircle className="size-20 text-green-500 mb-4" />
       <h1 className="text-3xl font-bold mb-2">Payment Successful!</h1>
       <p className="text-muted-foreground mb-8">Your payment has been verified and confirmed.</p>
-      <Link href="/dashboard/customer/my-appointments">
-        <Button className="bg-rose-500 hover:bg-rose-600">Go to Dashboard</Button>
-      </Link>
+      
+      {/* ⬇️ পেজ রিফ্রেশসহ ড্যাশবোর্ডে পাঠানোর ব্যবস্থা */}
+      <Button 
+        onClick={() => {
+          router.push("/dashboard/customer/my-appointments")
+          router.refresh()
+        }} 
+        className="bg-rose-500 hover:bg-rose-600"
+      >
+        Go to Dashboard
+      </Button>
     </div>
   )
 }

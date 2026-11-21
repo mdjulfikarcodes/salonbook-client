@@ -62,7 +62,6 @@ export const createAppointment = async (appointmentData: any) => {
   }
 }
 
-
 // Cancel a Pending appointment (customer action)
 export const cancelAppointment = async (id: string) => {
   try {
@@ -84,7 +83,6 @@ export const cancelAppointment = async (id: string) => {
     return null
   }
 }
-
 
 // ADMIN FUNCTIONS:
 

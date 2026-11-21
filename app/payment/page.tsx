@@ -1,47 +1,51 @@
 "use client"
 
-import { CreditCard, ShieldCheck, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 
 function PaymentContent() {
     const [loading, setLoading] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
     const searchParams = useSearchParams()
 
+    // Read appointment details from the URL
     const amount = searchParams.get("amount") || "1000"
     const serviceName = searchParams.get("service") || "Premium Hair Cut"
+    const appointmentId = searchParams.get("id") || ""
 
     const handleCheckout = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
+        setErrorMessage("")
 
+        // Data sent to our checkout API
         const payload = {
             amount: Number(amount),
             serviceName: serviceName,
+            appointmentId: appointmentId,
         }
-        console.log("১. পেমেন্ট পেজ থেকে পাঠানো ডেটা:", payload) // ⬅️ চেক ১
 
         try {
             const response = await fetch("/api/checkout_session", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
             })
 
             const data = await response.json()
-            console.log("২. API থেকে আসা রেসপন্স:", data) // ⬅️ চেক ২
 
             if (data.url) {
-                window.location.href = data.url
+                // Go to the Stripe payment page
+                window.location.assign(data.url)
             } else {
-                alert("Error: " + data.error)
+                setErrorMessage(data.error || "Could not start the payment.")
                 setLoading(false)
             }
         } catch (error) {
-            console.error("❌ Fetch Error:", error)
-            alert("Failed to connect to payment API")
+            console.error("Fetch Error:", error)
+            setErrorMessage("Failed to connect to payment API")
             setLoading(false)
         }
     }
@@ -64,6 +68,12 @@ function PaymentContent() {
                             <span className="font-bold text-rose-500 text-lg">৳{amount}</span>
                         </div>
                     </div>
+
+                    {errorMessage && (
+                        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-400">
+                            {errorMessage}
+                        </p>
+                    )}
                 </CardContent>
 
                 <CardFooter>
