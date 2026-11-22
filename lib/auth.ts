@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
-import { admin } from "better-auth/plugins"
+import { admin, jwt } from "better-auth/plugins" // ⬅️ jwt ইমপোর্ট করা হলো
 
 const client = new MongoClient(process.env.BETTER_AUTH_DB_URI as string);
 const db = client.db('salonbookdb');
@@ -18,10 +18,9 @@ export const auth = betterAuth({
         defaultValue: "customer",
         required: false,
       },
-      // ⬇️ ফোন নম্বর ফিল্ডটি এখানে যোগ করা হলো
       phone: {
         type: "string",
-        input: true, // প্রোফাইল থেকে আপডেট করা যাবে
+        input: true,
         required: false,
       }
     }
@@ -33,7 +32,8 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    admin() 
+    admin(),
+    jwt() // ⬅️ jwt প্লাগিন যুক্ত করা হলো
   ],
   database: mongodbAdapter(db, {
     client,

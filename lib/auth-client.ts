@@ -1,13 +1,13 @@
-import { inferAdditionalFields } from "better-auth/client/plugins"
+import { inferAdditionalFields, adminClient, jwtClient } from "better-auth/client/plugins"
 import { createAuthClient } from "better-auth/react"
 import { auth } from "./auth"
-import { adminClient } from "better-auth/client/plugins"
 
 export const authClient = createAuthClient({
     baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
     plugins: [
         inferAdditionalFields<typeof auth>(), 
-        adminClient() 
+        adminClient(),
+        jwtClient() // ⬅️ টোকেন জেনারেট করার জন্য জরুরি
     ],
 })
 

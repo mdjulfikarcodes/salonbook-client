@@ -1,13 +1,25 @@
-// The backend server address (change it if your API runs elsewhere)
+import { authClient } from "@/lib/auth-client"
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
+
+// ⬇️ টোকেন সহ ফেচ করার হেল্পার ফাংশন
+const fetchWithToken = async (url: string, options: RequestInit = {}) => {
+  const { data: tokenData } = await authClient.token();
+  const token = tokenData?.token;
+
+  const headers = {
+    ...options.headers,
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`,
+  };
+
+  return fetch(url, { ...options, headers });
+};
 
 // Fetch all appointments for one customer from the API
 export const getCustomerAppointments = async (customerId: string) => {
   try {
-    const res = await fetch(
-      `${BASE_URL}/appointments?customerId=${customerId}`,
-      { cache: "no-store" } // always get fresh data
-    )
+    const res = await fetchWithToken(`${BASE_URL}/appointments?customerId=${customerId}`)
 
     if (!res.ok) {
       throw new Error("Failed to load appointments")
@@ -15,7 +27,6 @@ export const getCustomerAppointments = async (customerId: string) => {
 
     return await res.json()
   } catch (error) {
-    // If something goes wrong, log it and return an empty list
     console.error("Error in getCustomerAppointments:", error)
     return []
   }
@@ -24,10 +35,7 @@ export const getCustomerAppointments = async (customerId: string) => {
 // Fetch appointment counts for a specific customer
 export const getCustomerAppointmentsCount = async (customerId: string) => {
   try {
-    const res = await fetch(
-      `${BASE_URL}/appointments/count?customerId=${customerId}`,
-      { cache: "no-store" }
-    )
+    const res = await fetchWithToken(`${BASE_URL}/appointments/count?customerId=${customerId}`)
 
     if (!res.ok) {
       throw new Error("Failed to load appointment counts")
@@ -40,14 +48,11 @@ export const getCustomerAppointmentsCount = async (customerId: string) => {
   }
 }
 
-// Create a new appointment and send it to the database
-export const createAppointment = async (appointmentData: any) => {
+// Create a new appointment (authFetch adds the JWT token automatically)
+export const createAppointment = async (appointmentData: Record<string, unknown>) => {
   try {
-    const res = await fetch(`${BASE_URL}/appointments`, {
+    const res = await fetchWithToken(`${BASE_URL}/appointments`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(appointmentData),
     })
 
@@ -65,11 +70,8 @@ export const createAppointment = async (appointmentData: any) => {
 // Cancel a Pending appointment (customer action)
 export const cancelAppointment = async (id: string) => {
   try {
-    const res = await fetch(`${BASE_URL}/appointments/${id}`, {
+    const res = await fetchWithToken(`${BASE_URL}/appointments/${id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ status: "Cancelled" }),
     })
 
@@ -89,9 +91,7 @@ export const cancelAppointment = async (id: string) => {
 // Fetch all appointments for Admin
 export const getAllAppointmentsAdmin = async () => {
   try {
-    const res = await fetch(`${BASE_URL}/admin/appointments`, {
-      cache: "no-store",
-    })
+    const res = await fetchWithToken(`${BASE_URL}/admin/appointments`)
 
     if (!res.ok) {
       throw new Error("Failed to load all appointments")
@@ -107,11 +107,8 @@ export const getAllAppointmentsAdmin = async () => {
 // Update appointment status by Admin (Confirm/Cancel)
 export const updateAppointmentStatusAdmin = async (id: string, status: string) => {
   try {
-    const res = await fetch(`${BASE_URL}/admin/appointments/${id}`, {
+    const res = await fetchWithToken(`${BASE_URL}/admin/appointments/${id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ status }),
     })
 
