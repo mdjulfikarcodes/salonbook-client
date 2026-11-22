@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google"
 
 import "./globals.css"
+import { Toaster } from "sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
@@ -38,6 +39,9 @@ export default function RootLayout({
           </main>
 
           <Footer />
+
+          {/* Sonner toast notifications */}
+          <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>
     </html>

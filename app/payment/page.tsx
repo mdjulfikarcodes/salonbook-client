@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
+import { toast } from "sonner"
 
 function PaymentContent() {
     const [loading, setLoading] = useState(false)
-    const [errorMessage, setErrorMessage] = useState("")
     const searchParams = useSearchParams()
 
     // Read appointment details from the URL
@@ -18,7 +18,6 @@ function PaymentContent() {
     const handleCheckout = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
-        setErrorMessage("")
 
         // Data sent to our checkout API
         const payload = {
@@ -40,12 +39,12 @@ function PaymentContent() {
                 // Go to the Stripe payment page
                 window.location.assign(data.url)
             } else {
-                setErrorMessage(data.error || "Could not start the payment.")
+                toast.error(data.error || "Could not start the payment.")
                 setLoading(false)
             }
         } catch (error) {
             console.error("Fetch Error:", error)
-            setErrorMessage("Failed to connect to payment API")
+            toast.error(error instanceof Error ? error.message : "Failed to connect to payment API")
             setLoading(false)
         }
     }
@@ -68,12 +67,6 @@ function PaymentContent() {
                             <span className="font-bold text-rose-500 text-lg">৳{amount}</span>
                         </div>
                     </div>
-
-                    {errorMessage && (
-                        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-400">
-                            {errorMessage}
-                        </p>
-                    )}
                 </CardContent>
 
                 <CardFooter>

@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cancelAppointment, getCustomerAppointments } from "@/lib/actions/appointments"
 import { useSession } from "@/lib/auth-client"
+import { toast } from "sonner"
 
 // Appointment + the extra fields our API sends
 type MyAppointment = Appointment & {
@@ -75,6 +76,7 @@ export default function MyAppointmentsPage() {
         }
       } catch (error) {
         console.error("Failed to fetch appointments", error)
+        toast.error(error instanceof Error ? error.message : "Failed to load appointments")
         if (active) setAppointments([])
       }
     }
@@ -99,7 +101,7 @@ export default function MyAppointmentsPage() {
     if (result) {
       window.location.reload()
     } else {
-      console.error("Failed to cancel appointment")
+      toast.error("Failed to cancel the appointment")
     }
   }
 

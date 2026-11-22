@@ -1,8 +1,11 @@
-export default function AdminOverviewPage() {
-  return (
-    <div>
-      <h1>Admin Overview</h1>
-      <p>Placeholder text for the admin overview page.</p>
-    </div>
-  )
-}
+import React from 'react';
+
+const page = () => {
+    return (
+        <div>
+            Overview
+        </div>
+    );
+};
+
+export default page;
