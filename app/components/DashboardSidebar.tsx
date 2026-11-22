@@ -50,7 +50,7 @@ const menuItemByRole: Record<"admin" | "customer", MenuItem[]> = {
 
 export function DashboardSidebar() {
     const { data: session, isPending } = useSession();
-    const role = (session?.user?.role as "admin" | "customer") || "customer";
+    const role = session?.user?.role?.toLowerCase() === "admin" ? "admin" : "customer";
     
     return (
         <Sidebar>
@@ -61,7 +61,7 @@ export function DashboardSidebar() {
                 <SidebarGroup>
                     <SidebarMenu>
                         {
-                            menuItemByRole[role].map((item) => (
+                            menuItemByRole[role]?.map((item) => (
                                 <SidebarMenuItem key={item.id}>
                                     <SidebarMenuButton render={<Link href={item.url} />}>
                                         <item.icon />
