@@ -1,14 +1,15 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, Suspense } from "react" // ⬅️ Suspense ইম্পোর্ট করা হলো
 import { Lock, Mail, Eye, EyeOff } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
 import { useRouter, useSearchParams } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 
-export default function SignInPage() {
+// ১. মূল লজিকটি একটি আলাদা কম্পোনেন্টে সরিয়ে নেওয়া হলো
+function SignInForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -17,20 +18,17 @@ export default function SignInPage() {
   const router = useRouter()
   const searchParams = useSearchParams();
   
-  // ⬇️ URL থেকে redirectTo নেওয়া হচ্ছে (না থাকলে হোম পেজ "/")
   const redirectTo = searchParams.get("redirectTo") ?? "/"
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    // Collect the form data
     const formData = { email, password }
     console.log("Sign in form data:", formData)
 
     setLoading(true)
 
     try {
-      // Sign in the user with Better Auth
       const { data, error } = await authClient.signIn.email({
         email: email,
         password: password,
@@ -38,23 +36,31 @@ export default function SignInPage() {
         callbackURL: redirectTo,
       })
 
-      // Show error if login fails
       if (error) {
         console.log("Sign in failed:", error.message)
         return
       }
 
-      // Login successful
       console.log("Sign in successful:", data)
 
-      // ⬇️ লগইন সফল হলে ইউজারকে তার কাঙ্ক্ষিত পেজে বা হোমপেজে পাঠাবে
       router.push(redirectTo)
       router.refresh() 
 
-    } catch (error: any) {
-      console.log("Something went wrong:", error.message)
+    } catch (error: unknown) {
+      console.log("Something went wrong:", (error as Error).message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: redirectTo,
+      })
+    } catch (error) {
+      console.error("Google sign in error:", error)
     }
   }
 
@@ -135,6 +141,29 @@ export default function SignInPage() {
           >
             {loading ? "Signing In..." : "Login"}
           </Button>
+
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-zinc-200 dark:border-zinc-700" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-zinc-500 dark:bg-neutral-900 dark:text-zinc-400">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleGoogleSignIn}
+            className="w-full rounded-full py-2.5 text-sm"
+          >
+            <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+              <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
+            </svg>
+            Sign in with Google
+          </Button>
         </form>
 
         <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
@@ -148,5 +177,14 @@ export default function SignInPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+// ২. মূল এক্সপোর্ট করা কম্পোনেন্টে Suspense দিয়ে র্যাপ করা হলো
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-20 text-muted-foreground">Loading...</div>}>
+      <SignInForm />
+    </Suspense>
   )
 }

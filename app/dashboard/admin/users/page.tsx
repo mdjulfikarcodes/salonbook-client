@@ -68,7 +68,7 @@ export default async function ManageUsersPage() {
                                                 : "text-zinc-500 bg-zinc-50"
                                         }
                                     >
-                                        {user.role || "customer"}
+                                        {user.role === "admin" ? "admin" : "customer"}
                                     </Badge>
                                 </TableCell>
 
@@ -119,3 +119,6 @@ export default async function ManageUsersPage() {
         </div>
     )
 }
+
+
+export const dynamic = 'force-dynamic'

@@ -102,8 +102,10 @@ export default function ServiceDetailsPage() {
         customerId: session?.user?.id,
         customerName: session?.user?.name,
         customerEmail: session?.user?.email,
-        serviceName: service?.name,
+        serviceName: service?.serviceName, 
         servicePrice: Number(service?.price),
+        serviceImage: service?.image, // ⬅️ ইমেজ যুক্ত করা হলো
+        category: service?.category,  // ⬅️ ক্যাটাগরি যুক্ত করা হলো
         appointmentDate: date,
         timeSlot: time,
         message: message,
@@ -172,19 +174,19 @@ export default function ServiceDetailsPage() {
           {service.image ? (
             <img
               src={service.image}
-              alt={service.name}
+              alt={service.serviceName} 
               className="h-96 w-full rounded-xl object-cover shadow-md"
             />
           ) : (
             <div className="flex h-96 w-full items-center justify-center rounded-xl bg-rose-50 text-6xl font-bold text-rose-400 shadow-md">
-              {service.name?.charAt(0)}
+              {service.serviceName?.charAt(0)} 
             </div>
           )}
         </div>
 
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-bold">{service.name}</h1>
+            <h1 className="text-3xl font-bold">{service.serviceName}</h1> 
             <Badge variant="outline">{service.category}</Badge>
           </div>
 

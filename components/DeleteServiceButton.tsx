@@ -1,7 +1,8 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { toast } from "@/components/ui/toast"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { authFetch } from "@/lib/core/client" 
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,12 +17,36 @@ import {
 
 type Props = {
   serviceId: string
-  onDelete: (formData: FormData) => void
 }
 
-export function DeleteServiceButton({ serviceId, onDelete }: Props) {
+export function DeleteServiceButton({ serviceId }: Props) {
+  const router = useRouter()
+  const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000"
+
+  const handleDelete = async () => {
+    try {
+      const res = await authFetch(`${BASE_URL}/services/${serviceId}`, {
+        method: "DELETE",
+      })
+
+      if (res.ok) {
+        toast.success("Service deleted", {
+          description: "The service has been removed successfully.",
+        })
+        router.refresh()
+      } else {
+        toast.error("Error", {
+          description: "Failed to delete service.",
+        })
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     <AlertDialog>
+      {/* ⬇️ এখানে asChild এরর দিচ্ছিল, সেটি সরিয়ে সরাসরি className দেওয়া হলো */}
       <AlertDialogTrigger className="inline-flex items-center justify-center rounded-md bg-red-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 transition-colors">
         Delete
       </AlertDialogTrigger>
@@ -37,20 +62,12 @@ export function DeleteServiceButton({ serviceId, onDelete }: Props) {
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           
-          <form 
-            action={async (formData) => {
-              await onDelete(formData);
-              toast.add({
-                title: "Service deleted",
-                description: "The service has been removed successfully.",
-              });
-            }}
+          <AlertDialogAction 
+            onClick={handleDelete} 
+            className="bg-red-600 hover:bg-red-700"
           >
-            <input type="hidden" name="id" value={serviceId} />
-            <AlertDialogAction type="submit" className="bg-red-600 hover:bg-red-700 ">
-              Delete
-            </AlertDialogAction>
-          </form>
+            Delete
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -1,6 +1,6 @@
 import { authClient } from "@/lib/auth-client"
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
+const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000"
 
 // ⬇️ টোকেন সহ ফেচ করার হেল্পার ফাংশন
 const fetchWithToken = async (url: string, options: RequestInit = {}) => {

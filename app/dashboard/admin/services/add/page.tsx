@@ -31,7 +31,8 @@ export default function AddEditServicePage() {
       if (!serviceId) return
       const data = await getServiceById(serviceId)
       if (data) {
-        setName(data.name || "")
+        // ⬇️ ডেটাবেসের সাথে মিল রেখে serviceName ব্যবহার করা হলো
+        setName(data.serviceName || "") 
         setCategory(data.category || "")
         setDescription(data.description || "")
         setPrice(data.price?.toString() || "")
@@ -47,7 +48,7 @@ export default function AddEditServicePage() {
     setLoading(true)
 
     const formData = new FormData()
-    formData.append("name", name)
+    formData.append("serviceName", name) 
     formData.append("category", category)
     formData.append("description", description)
     formData.append("price", price)

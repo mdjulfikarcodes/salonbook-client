@@ -140,3 +140,6 @@ export default function BrowseServicesPage() {
         </div>
     )
 }
+
+
+export const dynamic = 'force-dynamic';

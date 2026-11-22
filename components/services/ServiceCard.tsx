@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils"
 export type Service = {
   _id?: string
   id?: string
-  name: string
+  serviceName: string; // ⬅️ name থেকে serviceName করা হলো
   category: string
   price: number
   duration: number
@@ -26,7 +26,7 @@ export function ServiceCard({ service }: { service: Service }) {
   
   const serviceId = service._id || service.id;
   if (!serviceId) {
-    console.error("Service ID is missing for:", service.name);
+    console.error("Service ID is missing for:", service.serviceName);
     return null; 
   }
 
@@ -35,18 +35,18 @@ export function ServiceCard({ service }: { service: Service }) {
       {service.image ? (
         <img
           src={service.image}
-          alt={service.name}
+          alt={service.serviceName}
           className="h-48 w-full object-cover"
         />
       ) : (
         <div className="flex h-48 w-full items-center justify-center bg-rose-50 text-3xl font-bold text-rose-400">
-          {service.name?.charAt(0)}
+          {service.serviceName?.charAt(0)}
         </div>
       )}
 
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-base">{service.name}</CardTitle>
+          <CardTitle className="text-base">{service.serviceName}</CardTitle>
           <Badge variant="outline">{service.category}</Badge>
         </div>
       </CardHeader>

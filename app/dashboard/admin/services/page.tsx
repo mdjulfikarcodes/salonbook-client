@@ -5,13 +5,13 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { getServices } from "@/lib/api/services"
-import { deleteService, updateService } from "@/lib/actions/services"
+import { updateService } from "@/lib/actions/services"
 import { DeleteServiceButton } from "@/components/DeleteServiceButton"
 
 // Shape of one row in the table
 type ServiceRow = {
     _id: string
-    name: string
+    serviceName: string // ⬅️ name থেকে serviceName করা হলো
     price: number | string
     status: string
 }
@@ -19,12 +19,6 @@ type ServiceRow = {
 export default async function ManageServicesPage() {
     // Fetch ALL services (Active + Inactive) - never filter here
     const services: ServiceRow[] = await getServices()
-
-    async function handleDelete(formData: FormData) {
-        "use server"
-        await deleteService(formData.get("id") as string)
-        revalidatePath("/dashboard/admin/services")
-    }
 
     // Toggle status: send only { status: newStatus }, then refresh the page
     async function handleToggleStatus(formData: FormData) {
@@ -67,7 +61,7 @@ export default async function ManageServicesPage() {
 
                         {services.map((service) => (
                             <TableRow key={service._id}>
-                                <TableCell className="font-medium">{service.name}</TableCell>
+                                <TableCell className="font-medium">{service.serviceName}</TableCell> {/* ⬅️ serviceName */}
                                 <TableCell>৳{service.price}</TableCell>
                                 <TableCell>
                                     <Badge
@@ -90,7 +84,8 @@ export default async function ManageServicesPage() {
                                             Edit
                                         </Link>
 
-                                        <DeleteServiceButton serviceId={service._id} onDelete={handleDelete} />
+                                        {/* ⬇️ এখান থেকে onDelete প্রপ্সটি বাদ দেওয়া হলো */}
+                                        <DeleteServiceButton serviceId={service._id} />
 
                                         {/* Toggle form: sends id + currentStatus to the server action */}
                                         <form action={handleToggleStatus}>
@@ -110,3 +105,5 @@ export default async function ManageServicesPage() {
         </div>
     )
 }
+
+export const dynamic = 'force-dynamic'

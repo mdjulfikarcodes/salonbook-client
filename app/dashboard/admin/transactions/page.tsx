@@ -16,7 +16,7 @@ import {
 import { authClient } from "@/lib/auth-client"
 
 // The backend server address (change it if your API runs elsewhere)
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
+const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000"
 
 // Shape of one transaction (fields may come with slightly different names)
 type Transaction = {

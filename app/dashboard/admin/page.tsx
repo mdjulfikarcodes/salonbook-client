@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { authClient } from "@/lib/auth-client"
 
 // The backend server address (change it if your API runs elsewhere)
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
+const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000"
 
 // One row from any list API (we only need "status" for appointments)
 type Row = {
@@ -69,10 +69,10 @@ export default function AdminOverviewPage() {
 
         async function loadStats() {
             try {
-                // Fetch all 4 endpoints at the same time (appointments feed 3 cards)
-                const [usersData, servicesData, appointmentsData, transactionsData] =
+                // Fetch all endpoints at the same time
+                const [customersData, servicesData, appointmentsData, transactionsData] =
                     await Promise.all([
-                        fetchWithToken("/users"),
+                        fetchWithToken("/users/count"), // ⬅️ নতুন কাউন্ট API কল করা হলো
                         fetchWithToken("/services"),
                         fetchWithToken("/admin/appointments"),
                         fetchWithToken("/admin/transactions"),
@@ -83,7 +83,7 @@ export default function AdminOverviewPage() {
                 if (!active) return
 
                 setStats({
-                    customers: toArray(usersData, "users").length,
+                    customers: customersData?.totalCustomers || 0, // ⬅️ কাউন্ট ডেটা সেট করা হলো
                     services: toArray(servicesData, "services").length,
                     appointments: appointments.length,
                     pending: appointments.filter((a) => a.status === "Pending").length,

@@ -1,11 +1,13 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
+import { authFetch } from "../core/client"
+
+const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000"
 
 export type ServiceData = {
-    name: string;
+    serviceName: string; 
     category: string;
     description: string;
-    price: string;
-    duration: string;
+    price: number;    // ⬅️ string থেকে number করা হলো
+    duration: number; // ⬅️ string থেকে number করা হলো
     image: string;
     status: string;
 }
@@ -15,10 +17,11 @@ export const createService = async (formData: FormData) => {
         const imageFile = formData.get("image") as File;
         let imageUrl = "";
 
+        // ১. ইমেজ আপলোড (ImgBB)
         if (imageFile && imageFile.size > 0) {
             const imgBbFormData = new FormData();
             imgBbFormData.append("image", imageFile);
-            const imgBbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+            const imgBbApiKey = process.env.IMGBB_API_KEY;
 
             const imgRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgBbApiKey}`, {
                 method: "POST",
@@ -32,19 +35,24 @@ export const createService = async (formData: FormData) => {
             }
         }
 
+        // ২. সার্ভিস ডেটা তৈরি
         const serviceData: ServiceData = {
-            name: formData.get("name") as string,
+            serviceName: formData.get("serviceName") as string, 
             category: formData.get("category") as string,
             description: formData.get("description") as string,
-            price: formData.get("price") as string,
-            duration: formData.get("duration") as string,
+            price: Number(formData.get("price")),       // ⬅️ Number এ কনভার্ট
+            duration: Number(formData.get("duration")), // ⬅️ Number এ কনভার্ট
             status: formData.get("status") as string,
             image: imageUrl,
         };
 
-        const res = await fetch(`${BASE_URL}/services`, {
+        // ৩. ব্যাকএন্ডে পাঠানো (authFetch দিয়ে)
+        const res = await authFetch(`${BASE_URL}/services`, {
             method: "POST",
-            headers: { "content-type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify(serviceData),
         })
 
@@ -68,7 +76,7 @@ export const updateService = async (id: string, data: FormData | Record<string, 
             if (imageFile && imageFile.size > 0) {
                 const imgBbFormData = new FormData();
                 imgBbFormData.append("image", imageFile);
-                const imgBbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+                const imgBbApiKey = process.env.IMGBB_API_KEY;
 
                 const imgRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgBbApiKey}`, {
                     method: "POST",
@@ -79,7 +87,7 @@ export const updateService = async (id: string, data: FormData | Record<string, 
             }
 
             serviceData = {
-                name: data.get("name"),
+                serviceName: data.get("serviceName"), 
                 category: data.get("category"),
                 description: data.get("description"),
                 price: Number(data.get("price")),
@@ -92,9 +100,12 @@ export const updateService = async (id: string, data: FormData | Record<string, 
             serviceData = data;
         }
 
-        const res = await fetch(`${BASE_URL}/services/${id}`, {
+        const res = await authFetch(`${BASE_URL}/services/${id}`, { 
             method: "PATCH",
-            headers: { "content-type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            },
             body: JSON.stringify(serviceData),
         })
 
@@ -107,7 +118,7 @@ export const updateService = async (id: string, data: FormData | Record<string, 
 }
 
 export const deleteService = async (id: string) => {
-    const res = await fetch(`${BASE_URL}/services/${id}`, {
+    const res = await authFetch(`${BASE_URL}/services/${id}`, { 
         method: "DELETE",
     })
 

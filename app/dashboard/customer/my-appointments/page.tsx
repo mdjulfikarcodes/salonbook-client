@@ -23,6 +23,7 @@ import { toast } from "sonner"
 // Appointment + the extra fields our API sends
 type MyAppointment = Appointment & {
   serviceImage?: string
+  image?: string
   category?: string
   paymentStatus?: string
   requestedAt?: string
@@ -144,9 +145,9 @@ export default function MyAppointmentsPage() {
           {list.map((appointment) => (
             <Card key={appointment._id} className="pt-0 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               {/* Service image (or first letter if there is none) */}
-              {appointment.serviceImage ? (
+              {appointment.serviceImage || appointment.image ? (
                 <img
-                  src={appointment.serviceImage}
+                  src={appointment.serviceImage || appointment.image}
                   alt={appointment.serviceName}
                   className="h-40 w-full object-cover"
                 />

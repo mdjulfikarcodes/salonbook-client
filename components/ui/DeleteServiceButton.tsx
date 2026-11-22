@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,11 +20,11 @@ type Props = {
 export function DeleteServiceButton({ serviceId, onDelete }: Props) {
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm">
-          Delete
-        </Button>
+      {/* ⬇️ asChild সরিয়ে সরাসরি স্টাইল দেওয়া হলো */}
+      <AlertDialogTrigger className="inline-flex items-center justify-center rounded-md bg-red-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 transition-colors">
+        Delete
       </AlertDialogTrigger>
+      
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

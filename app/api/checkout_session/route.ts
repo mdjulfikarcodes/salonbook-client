@@ -34,8 +34,8 @@ export async function POST(req: Request) {
         appointmentId: appointmentId || "" // ⬇️ মেটাডেটাতে আইডি পাঠানো হলো
       },
 
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/payment?canceled=true`,
+      success_url: `${process.env.APP_URL || 'http://localhost:3000'}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.APP_URL || 'http://localhost:3000'}/payment?canceled=true`,
     });
 
     return NextResponse.json({ url: stripeSession.url });

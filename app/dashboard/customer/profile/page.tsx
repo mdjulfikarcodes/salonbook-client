@@ -165,12 +165,12 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                             />
                         </div>
 
-                        {/* Role (read-only) */}
+                        {/* Role (read-only) - ⬇️ এখানে সবসময় customer দেখাবে */}
                         <div>
                             <label htmlFor="role" className="mb-1 text-sm font-medium">Role</label>
                             <Input
                                 id="role"
-                                value={user.role || "customer"}
+                                value="customer" // ⬅️ এখানে value="customer" করা হলো
                                 readOnly
                                 className="text-muted-foreground"
                             />
