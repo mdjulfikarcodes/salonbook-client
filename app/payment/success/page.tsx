@@ -64,7 +64,7 @@ function SuccessContent() {
       <h1 className="text-3xl font-bold mb-2">Payment Successful!</h1>
       <p className="text-muted-foreground mb-8">Your payment has been verified and confirmed.</p>
       
-      {/* ⬇️ পেজ রিফ্রেশসহ ড্যাশবোর্ডে পাঠানোর ব্যবস্থা */}
+    
       <Button 
         onClick={() => {
           router.push("/dashboard/customer/my-appointments")

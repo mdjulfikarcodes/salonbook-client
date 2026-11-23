@@ -1,6 +1,6 @@
-const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000"
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-// Fetch ALL services (Active + Inactive) - no filtering here
+
 export const getServices = async (query?: string) => {
     const url = query ? `${BASE_URL}/services?${query}` : `${BASE_URL}/services`
 
@@ -10,7 +10,6 @@ export const getServices = async (query?: string) => {
 
         const data = await res.json()
 
-        // Backend may send a plain array OR { services: [...] } OR { data: [...] }
         if (Array.isArray(data)) return data
         return data?.services ?? data?.data ?? []
     } catch (error) {

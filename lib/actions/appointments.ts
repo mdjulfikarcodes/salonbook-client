@@ -1,8 +1,7 @@
 import { authClient } from "@/lib/auth-client"
 
-const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000"
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-// ⬇️ টোকেন সহ ফেচ করার হেল্পার ফাংশন
 const fetchWithToken = async (url: string, options: RequestInit = {}) => {
   const { data: tokenData } = await authClient.token();
   const token = tokenData?.token;
@@ -16,7 +15,6 @@ const fetchWithToken = async (url: string, options: RequestInit = {}) => {
   return fetch(url, { ...options, headers });
 };
 
-// Fetch all appointments for one customer from the API
 export const getCustomerAppointments = async (customerId: string) => {
   try {
     const res = await fetchWithToken(`${BASE_URL}/appointments?customerId=${customerId}`)
@@ -32,7 +30,6 @@ export const getCustomerAppointments = async (customerId: string) => {
   }
 }
 
-// Fetch appointment counts for a specific customer
 export const getCustomerAppointmentsCount = async (customerId: string) => {
   try {
     const res = await fetchWithToken(`${BASE_URL}/appointments/count?customerId=${customerId}`)
@@ -48,7 +45,6 @@ export const getCustomerAppointmentsCount = async (customerId: string) => {
   }
 }
 
-// Create a new appointment (authFetch adds the JWT token automatically)
 export const createAppointment = async (appointmentData: Record<string, unknown>) => {
   try {
     const res = await fetchWithToken(`${BASE_URL}/appointments`, {
@@ -67,7 +63,7 @@ export const createAppointment = async (appointmentData: Record<string, unknown>
   }
 }
 
-// Cancel a Pending appointment (customer action)
+
 export const cancelAppointment = async (id: string) => {
   try {
     const res = await fetchWithToken(`${BASE_URL}/appointments/${id}`, {
@@ -86,9 +82,9 @@ export const cancelAppointment = async (id: string) => {
   }
 }
 
-// ADMIN FUNCTIONS:
 
-// Fetch all appointments for Admin
+
+
 export const getAllAppointmentsAdmin = async () => {
   try {
     const res = await fetchWithToken(`${BASE_URL}/admin/appointments`)
@@ -104,7 +100,7 @@ export const getAllAppointmentsAdmin = async () => {
   }
 }
 
-// Update appointment status by Admin (Confirm/Cancel)
+// Update appointment status
 export const updateAppointmentStatusAdmin = async (id: string, status: string) => {
   try {
     const res = await fetchWithToken(`${BASE_URL}/admin/appointments/${id}`, {

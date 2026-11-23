@@ -1,6 +1,5 @@
 import { Calendar, Scissors, ShieldCheck, Sparkles, type LucideIcon } from "lucide-react"
 
-// Static list of 4 reasons + an icon for each
 const features: { title: string; description: string; icon: LucideIcon }[] = [
   {
     title: "Expert Stylists",
@@ -24,7 +23,7 @@ const features: { title: string; description: string; icon: LucideIcon }[] = [
   },
 ]
 
-// Simple "Why Choose Us?" section for the home page
+
 export default function WhyChooseUs() {
   return (
     <section className="w-full max-w-6xl mx-auto px-4 pb-14">
@@ -41,7 +40,7 @@ export default function WhyChooseUs() {
             key={title}
             className="rounded-xl border bg-card p-6 text-center transition-colors hover:border-rose-300 hover:bg-rose-50 dark:hover:border-rose-900 dark:hover:bg-rose-950/30"
           >
-            {/* Icon circle */}
+            
             <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-rose-100 text-rose-500 dark:bg-rose-950">
               <Icon className="size-6" />
             </span>

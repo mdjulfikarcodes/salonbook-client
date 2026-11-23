@@ -48,14 +48,14 @@ export default function MobileMenu({
       <button
         onClick={() => setOpen(!open)}
         aria-label="Toggle menu"
-        className="flex size-9 items-center justify-center rounded-full text-zinc-700 transition-colors hover:bg-rose-50 hover:text-rose-600 dark:text-zinc-200 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+        className="flex size-9 items-center justify-center rounded-full text-zinc-200 transition-colors hover:bg-white/10 hover:text-gold"
       >
         {open ? <X className="size-5" /> : <Menu className="size-5" />}
       </button>
 
       <div
         className={cn(
-          "absolute inset-x-0 top-full flex flex-col gap-1 overflow-hidden border-b border-zinc-100 bg-white p-4 shadow-lg transition-all duration-300 dark:border-zinc-800 dark:bg-zinc-900",
+          "absolute inset-x-0 top-full flex flex-col gap-1 overflow-hidden border-b border-gold/25 bg-ink-soft p-4 shadow-2xl transition-all duration-300",
           open ? "max-h-96 opacity-100" : "max-h-0 border-transparent opacity-0"
         )}
       >
@@ -67,8 +67,8 @@ export default function MobileMenu({
             className={cn(
               "rounded-xl px-3 py-2 text-sm font-medium transition-colors",
               pathname === link.href
-                ? "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400"
-                : "text-zinc-600 hover:bg-zinc-50 hover:text-rose-600 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-rose-400"
+                ? "bg-white/10 text-gold"
+                : "text-zinc-300 hover:bg-white/5 hover:text-gold"
             )}
           >
             {link.label}
@@ -81,14 +81,14 @@ export default function MobileMenu({
               <Link
                 href={dashboardHref}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-rose-600 transition-colors hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/10"
+                className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-gold transition-colors hover:bg-white/10"
               >
                 <LayoutDashboard className="size-4" />
                 Dashboard
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-zinc-600 transition-colors hover:bg-rose-50 hover:text-rose-600 dark:text-zinc-300 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+                className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-zinc-300 transition-colors hover:bg-white/10 hover:text-rose-400"
               >
                 <LogOut className="size-4" />
                 Logout
@@ -99,14 +99,14 @@ export default function MobileMenu({
               <Link
                 href="/sign-in"
                 onClick={() => setOpen(false)}
-                className="rounded-full border border-zinc-200 px-4 py-2 text-center text-sm font-medium text-zinc-700 transition-colors hover:border-rose-300 hover:text-rose-600 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-rose-500/40 dark:hover:text-rose-400"
+                className="rounded-full border border-white/20 px-4 py-2 text-center text-sm font-medium text-zinc-200 transition-colors hover:border-gold/50 hover:text-gold"
               >
                 Sign In
               </Link>
               <Link
                 href="/sign-up"
                 onClick={() => setOpen(false)}
-                className="rounded-full bg-rose-500 px-4 py-2 text-center text-sm font-medium text-white shadow-sm transition-colors hover:bg-rose-600"
+                className="rounded-full bg-gradient-to-r from-rose-500 to-rosegold px-4 py-2 text-center text-sm font-semibold text-white shadow-md transition-all hover:from-rose-600"
               >
                 Sign Up
               </Link>

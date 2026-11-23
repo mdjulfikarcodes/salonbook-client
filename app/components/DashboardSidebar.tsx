@@ -19,6 +19,7 @@ import {
     PlusCircle,
     Users,
     CreditCard,
+    Home,
 } from "lucide-react"
 import Link from "next/link";
 
@@ -39,7 +40,6 @@ const menuItemByRole: Record<"admin" | "customer", MenuItem[]> = {
         { id: "admin-users", name: "Manage Users", url: "/dashboard/admin/users", icon: Users },
         { id: "admin-transactions", name: "Transactions", url: "/dashboard/admin/transactions", icon: CreditCard },
         { id: "admin-profile", name: "My Profile", url: "/dashboard/admin/profile", icon: User },
-        // ⬅️ ডুপ্লিকেট "My Profile" লাইনটি এখান থেকে মুছে দেওয়া হয়েছে
     ],
     customer: [
         { id: "customer-overview", name: "Overview", url: "/dashboard/customer", icon: LayoutDashboard },
@@ -53,7 +53,7 @@ export function DashboardSidebar() {
     const role = session?.user?.role?.toLowerCase() === "admin" ? "admin" : "customer";
     
     return (
-        <Sidebar>
+        <Sidebar className="shadow-[12px_0_32px_-16px_rgba(0,0,0,0.5)]">
             <SidebarHeader />
             <SidebarContent>
                 <SidebarGroup />
@@ -70,6 +70,14 @@ export function DashboardSidebar() {
                                 </SidebarMenuItem>
                             ))
                         }
+                        
+                        
+                        <SidebarMenuItem>
+                            <SidebarMenuButton render={<Link href="/" />}>
+                                <Home />
+                                <span>Back to Home</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>

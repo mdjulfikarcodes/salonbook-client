@@ -1,52 +1,67 @@
 import { authFetch } from "../core/client"
 
-const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000"
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
+
+const IMGBB_API_KEY = process.env.NEXT_PUBLIC_IMGBB_API_KEY
 
 export type ServiceData = {
     serviceName: string; 
     category: string;
     description: string;
-    price: number;    // ⬅️ string থেকে number করা হলো
-    duration: number; // ⬅️ string থেকে number করা হলো
+    price: number;  
+    duration: number;
     image: string;
     status: string;
 }
+
+
+const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve((reader.result as string).split(',')[1]);
+        reader.onerror = (error) => reject(error);
+    });
+};
 
 export const createService = async (formData: FormData) => {
     try {
         const imageFile = formData.get("image") as File;
         let imageUrl = "";
 
-        // ১. ইমেজ আপলোড (ImgBB)
+        // Image upload to ImgBB
         if (imageFile && imageFile.size > 0) {
-            const imgBbFormData = new FormData();
-            imgBbFormData.append("image", imageFile);
-            const imgBbApiKey = process.env.IMGBB_API_KEY;
+            const base64Image = await fileToBase64(imageFile);
+            
+            const imgBbFormData = new URLSearchParams();
+            imgBbFormData.append("image", base64Image);
 
-            const imgRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgBbApiKey}`, {
+            
+            const imgRes = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
                 method: "POST",
                 body: imgBbFormData,
             });
+            
             const imgData = await imgRes.json();
+            
             if (imgData.success) {
                 imageUrl = imgData.data.url;
             } else {
+                console.error("ImgBB Error:", imgData);
                 throw new Error("Image upload failed");
             }
         }
 
-        // ২. সার্ভিস ডেটা তৈরি
         const serviceData: ServiceData = {
             serviceName: formData.get("serviceName") as string, 
             category: formData.get("category") as string,
             description: formData.get("description") as string,
-            price: Number(formData.get("price")),       // ⬅️ Number এ কনভার্ট
-            duration: Number(formData.get("duration")), // ⬅️ Number এ কনভার্ট
-            status: formData.get("status") as string,
+            price: Number(formData.get("price")),       
+            duration: Number(formData.get("duration")), 
+            status: (formData.get("status") as string) || "Active",
             image: imageUrl,
         };
 
-        // ৩. ব্যাকএন্ডে পাঠানো (authFetch দিয়ে)
         const res = await authFetch(`${BASE_URL}/services`, {
             method: "POST",
             headers: { 
@@ -64,44 +79,18 @@ export const createService = async (formData: FormData) => {
     }
 }
 
-// Works with FormData (edit form) OR a plain object ({ status: "Inactive" })
 export const updateService = async (id: string, data: FormData | Record<string, unknown>) => {
     try {
         let serviceData: Record<string, unknown> = {}
 
         if (data instanceof FormData) {
-            const imageFile = data.get("image") as File;
-            let imageUrl = "";
-
-            if (imageFile && imageFile.size > 0) {
-                const imgBbFormData = new FormData();
-                imgBbFormData.append("image", imageFile);
-                const imgBbApiKey = process.env.IMGBB_API_KEY;
-
-                const imgRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgBbApiKey}`, {
-                    method: "POST",
-                    body: imgBbFormData,
-                });
-                const imgData = await imgRes.json();
-                if (imgData.success) imageUrl = imgData.data.url;
-            }
-
-            serviceData = {
-                serviceName: data.get("serviceName"), 
-                category: data.get("category"),
-                description: data.get("description"),
-                price: Number(data.get("price")),
-                duration: Number(data.get("duration")),
-                status: data.get("status"),
-            }
-            if (imageUrl) serviceData.image = imageUrl;
+         
         } else {
-            // Plain object, e.g. { status: "Inactive" }
-            serviceData = data;
+            serviceData = data; 
         }
 
         const res = await authFetch(`${BASE_URL}/services/${id}`, { 
-            method: "PATCH",
+            method: "PATCH", 
             headers: { 
                 "Content-Type": "application/json", 
                 "Accept": "application/json"
@@ -122,10 +111,6 @@ export const deleteService = async (id: string) => {
         method: "DELETE",
     })
 
-    if (!res.ok) {
-        console.error("Delete failed with status:", res.status)
-        return null
-    }
-
-    return res.json()
+    if (!res.ok) return null;
+    return res.json();
 }

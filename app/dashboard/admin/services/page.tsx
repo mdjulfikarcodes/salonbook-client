@@ -1,35 +1,21 @@
 import Link from "next/link"
-import { revalidatePath } from "next/cache"
 import { Badge } from "@/components/ui/badge"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { getServices } from "@/lib/api/services"
-import { updateService } from "@/lib/actions/services"
 import { DeleteServiceButton } from "@/components/DeleteServiceButton"
+import { ToggleStatusButton } from "@/components/ToggleStatusButton" 
 
-// Shape of one row in the table
 type ServiceRow = {
     _id: string
-    serviceName: string // ⬅️ name থেকে serviceName করা হলো
+    serviceName: string
     price: number | string
     status: string
 }
 
 export default async function ManageServicesPage() {
-    // Fetch ALL services (Active + Inactive) - never filter here
     const services: ServiceRow[] = await getServices()
-
-    // Toggle status: send only { status: newStatus }, then refresh the page
-    async function handleToggleStatus(formData: FormData) {
-        "use server"
-        const id = formData.get("id") as string
-        const currentStatus = formData.get("currentStatus") as string
-        const newStatus = currentStatus === "Active" ? "Inactive" : "Active"
-
-        await updateService(id, { status: newStatus })
-        revalidatePath("/dashboard/admin/services")
-    }
 
     return (
         <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
@@ -58,10 +44,9 @@ export default async function ManageServicesPage() {
                                 </TableCell>
                             </TableRow>
                         )}
-
                         {services.map((service) => (
                             <TableRow key={service._id}>
-                                <TableCell className="font-medium">{service.serviceName}</TableCell> {/* ⬅️ serviceName */}
+                                <TableCell className="font-medium">{service.serviceName}</TableCell>
                                 <TableCell>৳{service.price}</TableCell>
                                 <TableCell>
                                     <Badge
@@ -83,18 +68,13 @@ export default async function ManageServicesPage() {
                                         >
                                             Edit
                                         </Link>
-
-                                        {/* ⬇️ এখান থেকে onDelete প্রপ্সটি বাদ দেওয়া হলো */}
                                         <DeleteServiceButton serviceId={service._id} />
-
-                                        {/* Toggle form: sends id + currentStatus to the server action */}
-                                        <form action={handleToggleStatus}>
-                                            <input type="hidden" name="id" value={service._id} />
-                                            <input type="hidden" name="currentStatus" value={service.status} />
-                                            <Button variant="outline" size="sm" type="submit">
-                                                {service.status === "Active" ? "Deactivate" : "Activate"}
-                                            </Button>
-                                        </form>
+                                        
+                                        
+                                        <ToggleStatusButton 
+                                            serviceId={service._id} 
+                                            currentStatus={service.status} 
+                                        />
                                     </div>
                                 </TableCell>
                             </TableRow>

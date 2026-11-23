@@ -19,6 +19,18 @@ import { Button } from "@/components/ui/button"
 import { cancelAppointment, getCustomerAppointments } from "@/lib/actions/appointments"
 import { useSession } from "@/lib/auth-client"
 import { toast } from "sonner"
+import Image from "next/image"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 // Appointment + the extra fields our API sends
 type MyAppointment = Appointment & {
@@ -45,7 +57,7 @@ function getPaymentColor(paymentStatus?: string) {
 // Make the date look nice, e.g. "Nov 25, 2026"
 function formatDate(date?: string) {
   if (!date) return "-"
-  return new Date(date).toLocaleDateString("en-US", {
+  return new Date(date).toLocaleDateString("en-us", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -71,7 +83,6 @@ export default function MyAppointmentsPage() {
       try {
         const data = await getCustomerAppointments(userId as string)
         if (active) {
-          // API may send a plain array OR { appointments: [...] }
           const list = Array.isArray(data) ? data : (data?.appointments ?? data?.data ?? [])
           setAppointments(list)
         }
@@ -85,28 +96,26 @@ export default function MyAppointmentsPage() {
     fetchAppointments()
 
     return () => {
-      active = false // ignore results after leaving the page
+      active = false
     }
   }, [session?.user?.id])
 
-  // Loading = session is being checked, OR user found but data not back yet
   const isLoading = isPending || (!!session?.user?.id && appointments === null)
 
-  // Cancel a Pending appointment: confirm → API → reload
+  // Cancel a Pending appointment: API → reload
   async function handleCancel(id: string) {
-    const ok = window.confirm("Are you sure you want to cancel this appointment?")
-    if (!ok) return
-
     const result = await cancelAppointment(id)
 
     if (result) {
-      window.location.reload()
+      toast.success("Appointment cancelled successfully!")
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
     } else {
       toast.error("Failed to cancel the appointment")
     }
   }
 
-  // Go to the Stripe payment page with the appointment details
   function handlePay(appointment: MyAppointment) {
     const params = new URLSearchParams({
       amount: String(appointment.servicePrice),
@@ -117,7 +126,6 @@ export default function MyAppointmentsPage() {
     router.push(`/payment?${params.toString()}`)
   }
 
-  // Simple loading text while fetching
   if (isLoading) {
     return (
       <div className="w-full max-w-6xl mx-auto p-4 md:p-8 flex justify-center py-20">
@@ -144,11 +152,12 @@ export default function MyAppointmentsPage() {
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {list.map((appointment) => (
             <Card key={appointment._id} className="pt-0 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              {/* Service image (or first letter if there is none) */}
               {appointment.serviceImage || appointment.image ? (
-                <img
-                  src={appointment.serviceImage || appointment.image}
+                <Image
+                  src={(appointment.serviceImage || appointment.image)as string}
                   alt={appointment.serviceName}
+                  width={400}
+                  height={160}
                   className="h-40 w-full object-cover"
                 />
               ) : (
@@ -165,7 +174,6 @@ export default function MyAppointmentsPage() {
                   </Badge>
                 </div>
 
-                {/* Category + payment badges */}
                 <div className="flex flex-wrap items-center gap-2">
                   {appointment.category && (
                     <Badge variant="outline" className="text-zinc-600 bg-zinc-50 border-zinc-200">
@@ -198,7 +206,6 @@ export default function MyAppointmentsPage() {
                   Requested: {formatDate(appointment.requestedAt)}
                 </p>
 
-                {/* Pay Now button: only for Confirmed + Unpaid appointments */}
                 {appointment.status === "Confirmed" &&
                   appointment.paymentStatus === "Unpaid" && (
                     <Button
@@ -212,18 +219,31 @@ export default function MyAppointmentsPage() {
                     </Button>
                   )}
 
-                {/* Cancel button: only for Pending appointments */}
+                {/* ⬇️ Cancel Button with AlertDialog (alert সরানো হয়েছে) */}
                 {appointment.status === "Pending" && appointment._id && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleCancel(appointment._id!)}
-                    className="mt-2 w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                  >
-                    <XCircle className="mr-1 size-4" />
-                    Cancel Appointment
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger className="mt-2 w-full inline-flex items-center justify-center rounded-full border border-red-200 bg-transparent px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors">
+                      <XCircle className="mr-1 size-4" />
+                      Cancel Appointment
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently cancel your appointment.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Keep Appointment</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleCancel(appointment._id!)}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          Yes, Cancel
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 )}
               </CardContent>
             </Card>

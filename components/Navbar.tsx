@@ -19,7 +19,6 @@ export default function Navbar() {
   const { data: session, isPending } = useSession()
   const user: NavbarUser | undefined = session?.user
 
-  // The dashboard has its own SidebarTrigger header — hide the site Navbar there
   if (pathname.startsWith("/dashboard")) return null
 
   const dashboardHref =
@@ -40,13 +39,13 @@ export default function Navbar() {
  
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/95 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95">
+    <header className="sticky top-0 z-50 border-b border-gold/30 bg-ink/95 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.6)] backdrop-blur">
       <nav className="relative mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
         <Link
           href="/"
-          className="flex items-center gap-2 text-lg font-bold text-zinc-900 transition-colors hover:text-rose-600 dark:text-white dark:hover:text-rose-400"
+          className="flex items-center gap-2 text-lg font-bold tracking-wide text-white transition-colors hover:text-gold"
         >
-          <span className="flex size-9 items-center justify-center rounded-full bg-rose-500 text-white shadow-sm">
+          <span className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 via-rosegold to-gold text-white shadow-md shadow-rose-500/30">
             <Scissors className="size-4" />
           </span>
           SalonBook
@@ -60,8 +59,8 @@ export default function Navbar() {
               className={cn(
                 "rounded-full px-4 py-2 text-sm font-medium transition-colors",
                 isActive(link.href)
-                  ? "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400"
-                  : "text-zinc-600 hover:bg-zinc-50 hover:text-rose-600 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-rose-400"
+                  ? "bg-white/10 text-gold"
+                  : "text-zinc-300 hover:bg-white/5 hover:text-gold"
               )}
             >
               {link.label}
@@ -71,12 +70,12 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-2 md:flex">
           {isPending ? (
-            <div className="h-9 w-24 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
+            <div className="h-9 w-24 animate-pulse rounded-full bg-white/10" />
           ) : user ? (
             <>
               <Link
                 href={dashboardHref}
-                className="rounded-full border border-rose-200 px-4 py-2 text-sm font-medium text-rose-600 transition-colors hover:bg-rose-50 dark:border-rose-500/30 dark:text-rose-400 dark:hover:bg-rose-500/10"
+                className="rounded-full border border-gold/50 px-4 py-2 text-sm font-medium text-gold transition-colors hover:bg-gold/10"
               >
                 Dashboard
               </Link>
@@ -86,13 +85,13 @@ export default function Navbar() {
             <>
               <Link
                 href="/sign-in"
-                className="rounded-full px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:text-rose-600 dark:text-zinc-300 dark:hover:text-rose-400"
+                className="rounded-full px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:text-gold"
               >
                 Sign In
               </Link>
               <Link
                 href="/sign-up"
-                className="rounded-full bg-rose-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-rose-600"
+                className="rounded-full bg-gradient-to-r from-rose-500 to-rosegold px-4 py-2 text-sm font-semibold text-white shadow-md shadow-rose-500/30 transition-all hover:from-rose-600"
               >
                 Sign Up
               </Link>

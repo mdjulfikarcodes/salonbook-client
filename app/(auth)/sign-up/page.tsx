@@ -15,7 +15,7 @@ export default function SignUpPage() {
   const [photoURL, setPhotoURL] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const role = "customer" // locked — admins are never created here
+  const role = "customer"
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -56,8 +56,8 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-100 bg-white p-8 shadow-lg dark:border-zinc-800 dark:bg-neutral-900">
+    <div className="flex min-h-[80vh] items-center justify-center bg-gradient-to-b from-blush to-white px-4 py-16 dark:from-zinc-950 dark:to-neutral-900">
+      <div className="w-full max-w-md rounded-3xl border border-rose-100 bg-white p-8 shadow-[0_24px_60px_-24px_rgba(190,24,93,0.35)] dark:border-zinc-800 dark:bg-neutral-900">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
             Create Account
@@ -84,7 +84,7 @@ export default function SignUpPage() {
                 placeholder="Your name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                className="w-full rounded-xl border border-zinc-200 py-2.5 pr-3 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
+                className="w-full rounded-xl border border-zinc-200 py-2.5 pr-3 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-4 focus:ring-rose-500/15 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
               />
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function SignUpPage() {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-full rounded-xl border border-zinc-200 py-2.5 pr-3 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
+                className="w-full rounded-xl border border-zinc-200 py-2.5 pr-3 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-4 focus:ring-rose-500/15 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
               />
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function SignUpPage() {
                 placeholder="https://example.com/photo.jpg"
                 value={photoURL}
                 onChange={(event) => setPhotoURL(event.target.value)}
-                className="w-full rounded-xl border border-zinc-200 py-2.5 pr-3 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
+                className="w-full rounded-xl border border-zinc-200 py-2.5 pr-3 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-4 focus:ring-rose-500/15 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
               />
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function SignUpPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="w-full rounded-xl border border-zinc-200 py-2.5 pr-10 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
+                className="w-full rounded-xl border border-zinc-200 py-2.5 pr-10 pl-9 text-sm text-zinc-900 outline-none transition-colors focus:border-rose-500 focus:ring-4 focus:ring-rose-500/15 dark:border-zinc-700 dark:bg-neutral-950 dark:text-white"
               />
               <button
                 type="button"
@@ -188,12 +188,12 @@ export default function SignUpPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-rose-500 py-2.5 text-sm text-white hover:bg-rose-600"
+            className="w-full rounded-full bg-gradient-to-r from-rose-500 to-rosegold py-2.5 text-sm font-semibold text-white shadow-lg shadow-rose-500/30 transition-all hover:from-rose-600"
           >
             {loading ? "Creating account..." : "Sign up"}
           </Button>
 
-          {/* ⬇️ Google SignUp বাটন (Sign In এর মত ডিজাইন) */}
+        
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-zinc-200 dark:border-zinc-700" />
@@ -209,7 +209,7 @@ export default function SignUpPage() {
             type="button"
             variant="outline"
             onClick={handleGoogleSignUp}
-            className="w-full rounded-full py-2.5 text-sm"
+            className="w-full rounded-full py-2.5 text-sm font-medium transition-all hover:shadow-md"
           >
             <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
               <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>

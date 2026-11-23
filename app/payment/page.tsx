@@ -10,7 +10,6 @@ function PaymentContent() {
     const [loading, setLoading] = useState(false)
     const searchParams = useSearchParams()
 
-    // Read appointment details from the URL
     const amount = searchParams.get("amount") || "1000"
     const serviceName = searchParams.get("service") || "Premium Hair Cut"
     const appointmentId = searchParams.get("id") || ""
@@ -19,7 +18,7 @@ function PaymentContent() {
         e.preventDefault()
         setLoading(true)
 
-        // Data sent to our checkout API
+   
         const payload = {
             amount: Number(amount),
             serviceName: serviceName,
@@ -36,7 +35,7 @@ function PaymentContent() {
             const data = await response.json()
 
             if (data.url) {
-                // Go to the Stripe payment page
+               
                 window.location.assign(data.url)
             } else {
                 toast.error(data.error || "Could not start the payment.")
@@ -57,7 +56,7 @@ function PaymentContent() {
                 </CardHeader>
 
                 <CardContent className="space-y-4">
-                    <div className="bg-zinc-100 rounded-lg p-4 space-y-3">
+                    <div className="bg-black rounded-lg p-4 space-y-3">
                         <div className="flex justify-between text-sm">
                             <span className="text-zinc-500">Service</span>
                             <span className="font-medium">{serviceName}</span>

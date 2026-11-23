@@ -3,7 +3,6 @@ import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-// Shown for any URL that does not exist (404)
 export default function NotFound() {
     return (
         <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center">

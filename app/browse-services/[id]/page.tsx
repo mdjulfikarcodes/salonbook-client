@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState, type FormEvent } from "react"
 import { Clock } from "lucide-react"
+import { toast } from "sonner"
 
 import type { Service } from "@/components/services/ServiceCard"
 import { Badge } from "@/components/ui/badge"
@@ -19,6 +20,9 @@ import {
 import { getServiceById } from "@/lib/api/services"
 import { useSession } from "@/lib/auth-client"
 import { createAppointment } from "@/lib/actions/appointments"
+import Image from "next/image"
+
+import { ServiceSkeleton } from "@/components/services/ServiceSkeleton"
 
 const timeSlots = [
   "10:00 AM", "11:00 AM", "12:00 PM",
@@ -43,14 +47,14 @@ export default function ServiceDetailsPage() {
   const [error, setError] = useState("")
   const [showSuccess, setShowSuccess] = useState(false)
 
-  // ১. লগইন না থাকলে sign-in এ redirect
+
   useEffect(() => {
     if (!isPending && !session) {
       router.push(`/sign-in?redirectTo=/browse-services/${serviceId}`)
     }
   }, [session, isPending, router, serviceId])
 
-  // ২. সার্ভিস ডেটা ফেচ
+  //Service Data Fetch
   useEffect(() => {
     let active = true
 
@@ -83,7 +87,7 @@ export default function ServiceDetailsPage() {
     }
   }, [serviceId, session])
 
-  // ৩. অ্যাপয়েন্টমেন্ট সাবমিট করা
+  //Submitting an appointment
   async function handleBooking(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError("")
@@ -91,6 +95,7 @@ export default function ServiceDetailsPage() {
 
     if (!date || !time) {
       setError("Please pick a date and a time slot.")
+      toast.error("Please pick a date and a time slot.")
       return
     }
 
@@ -102,10 +107,10 @@ export default function ServiceDetailsPage() {
         customerId: session?.user?.id,
         customerName: session?.user?.name,
         customerEmail: session?.user?.email,
-        serviceName: service?.serviceName, 
+        serviceName: service?.serviceName,
         servicePrice: Number(service?.price),
-        serviceImage: service?.image, // ⬅️ ইমেজ যুক্ত করা হলো
-        category: service?.category,  // ⬅️ ক্যাটাগরি যুক্ত করা হলো
+        serviceImage: service?.image,
+        category: service?.category,
         appointmentDate: date,
         timeSlot: time,
         message: message,
@@ -122,15 +127,17 @@ export default function ServiceDetailsPage() {
         setMessage("")
         setTime("")
         setDate("")
-        
-        // বুকিং সফল হলে ড্যাশবোর্ডে চলে যাবে
+
+        toast.success("Appointment booked successfully!")
         router.push("/dashboard/customer/my-appointments")
-        
+
       } else {
         setError("Failed to book appointment. Try again.")
+        toast.error("Failed to book appointment. Try again.")
       }
     } catch (err) {
       setError("Something went wrong.")
+      toast.error("Something went wrong.")
     } finally {
       setIsSubmitting(false)
     }
@@ -150,8 +157,8 @@ export default function ServiceDetailsPage() {
 
   if (loading) {
     return (
-      <div className="w-full max-w-6xl mx-auto px-4 py-8 min-h-[70vh] flex items-center justify-center">
-        <p className="text-center text-muted-foreground animate-pulse">Loading service details...</p>
+      <div className="w-full max-w-6xl mx-auto px-4 py-8 min-h-[70vh]">
+        <ServiceSkeleton />
       </div>
     )
   }
@@ -172,21 +179,23 @@ export default function ServiceDetailsPage() {
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <div>
           {service.image ? (
-            <img
+            <Image
               src={service.image}
-              alt={service.serviceName} 
-              className="h-96 w-full rounded-xl object-cover shadow-md"
+              alt={service.serviceName}
+              width={600}
+              height={384}
+              className="h-96 w-full object-cover shadow-md rounded-xl h-auto"
             />
           ) : (
             <div className="flex h-96 w-full items-center justify-center rounded-xl bg-rose-50 text-6xl font-bold text-rose-400 shadow-md">
-              {service.serviceName?.charAt(0)} 
+              {service.serviceName?.charAt(0)}
             </div>
           )}
         </div>
 
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-bold">{service.serviceName}</h1> 
+            <h1 className="text-3xl font-bold">{service.serviceName}</h1>
             <Badge variant="outline">{service.category}</Badge>
           </div>
 

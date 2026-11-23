@@ -1,6 +1,6 @@
-const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000"
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-// Fetch total successful payments count (admin dashboard)
+// Fetch total successful payments count
 export const getPaymentsCount = async () => {
     try {
         const res = await fetch(`${BASE_URL}/payments/count`, { cache: "no-store" })
@@ -12,7 +12,7 @@ export const getPaymentsCount = async () => {
     }
 }
 
-// Fetch all transactions (admin view)
+
 export const getAllTransactions = async () => {
     try {
         const res = await fetch(`${BASE_URL}/admin/transactions`, { cache: "no-store" })
@@ -20,7 +20,7 @@ export const getAllTransactions = async () => {
 
         const data = await res.json()
 
-        // API may send a plain array OR { transactions: [...] }
+        
         if (Array.isArray(data)) return data
         return data?.transactions ?? data?.data ?? []
     } catch (error) {

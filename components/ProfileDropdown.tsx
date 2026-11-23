@@ -4,10 +4,9 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react"
-import {signOut} from "@/lib/auth-client"
-
-// import { authClient } from "@/lib/auth-client"
+import { signOut } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 export type NavbarUser = {
   name?: string | null
@@ -48,7 +47,7 @@ export default function ProfileDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-   const handleSignOut = async() => {
+  const handleSignOut = async () => {
     await signOut()
   }
 
@@ -59,7 +58,6 @@ export default function ProfileDropdown({
         className="flex items-center gap-1 rounded-full border border-zinc-200 p-1 pr-2 transition-colors hover:border-rose-300 hover:bg-rose-50 dark:border-zinc-700 dark:hover:border-rose-500/40 dark:hover:bg-rose-500/10"
       >
         {user.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={user.image}
             alt={user.name || "Profile"}

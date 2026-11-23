@@ -21,7 +21,7 @@ type Props = {
 
 export function DeleteServiceButton({ serviceId }: Props) {
   const router = useRouter()
-  const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000"
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
   const handleDelete = async () => {
     try {
@@ -46,7 +46,7 @@ export function DeleteServiceButton({ serviceId }: Props) {
 
   return (
     <AlertDialog>
-      {/* ⬇️ এখানে asChild এরর দিচ্ছিল, সেটি সরিয়ে সরাসরি className দেওয়া হলো */}
+      
       <AlertDialogTrigger className="inline-flex items-center justify-center rounded-md bg-red-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 transition-colors">
         Delete
       </AlertDialogTrigger>

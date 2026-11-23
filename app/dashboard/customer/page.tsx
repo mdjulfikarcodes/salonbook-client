@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useSession } from "@/lib/auth-client"
 import { getCustomerAppointmentsCount } from "@/lib/actions/appointments"
 
-// The 4 numbers we show on the cards
+
 type Counts = {
     total: number
     pending: number
@@ -17,7 +17,7 @@ type Counts = {
 
 const emptyCounts: Counts = { total: 0, pending: 0, confirmed: 0, cancelled: 0 }
 
-// Card layout info: label + icon + color
+
 const cards: { label: string; key: keyof Counts; icon: LucideIcon; color: string }[] = [
     { label: "Total", key: "total", icon: Calendar, color: "text-rose-500 bg-rose-100 dark:bg-rose-950" },
     { label: "Pending", key: "pending", icon: Clock, color: "text-amber-500 bg-amber-100 dark:bg-amber-950" },
@@ -26,13 +26,12 @@ const cards: { label: string; key: keyof Counts; icon: LucideIcon; color: string
 ]
 
 export default function CustomerOverviewPage() {
-    // Logged-in user
+   
     const { data: session, isPending } = useSession()
 
-    // Stats state (null = not fetched yet)
+
     const [counts, setCounts] = useState<Counts | null>(null)
 
-    // Fetch the counts once we know the user id
     useEffect(() => {
         const userId = session?.user?.id
         if (!userId) return
@@ -58,14 +57,14 @@ export default function CustomerOverviewPage() {
         fetchCounts()
 
         return () => {
-            active = false // ignore results after leaving the page
+            active = false 
         }
     }, [session?.user?.id])
 
     // Loading = session is being checked, OR user found but counts not back yet
     const isLoading = isPending || (!!session?.user?.id && counts === null)
 
-    // Simple loading text while fetching
+    
     if (isLoading) {
         return (
             <div className="w-full max-w-6xl mx-auto p-4 md:p-8">
@@ -83,7 +82,7 @@ export default function CustomerOverviewPage() {
                 Welcome back{session?.user?.name ? `, ${session.user.name}` : ""}! Here is your appointment summary.
             </p>
 
-            {/* 4 cards: 1 column on mobile, 4 columns on desktop */}
+            
             <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4">
                 {cards.map(({ label, key, icon: Icon, color }) => (
                     <Card key={label} className="pt-0 shadow-sm">

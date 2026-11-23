@@ -7,7 +7,7 @@ export const authClient = createAuthClient({
     plugins: [
         inferAdditionalFields<typeof auth>(), 
         adminClient(),
-        jwtClient() // ⬅️ টোকেন জেনারেট করার জন্য জরুরি
+        jwtClient() 
     ],
 })
 

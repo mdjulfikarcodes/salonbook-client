@@ -6,8 +6,9 @@ import { Camera, Mail, Phone, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { toast } from "@/components/ui/toast"
+import { toast } from "sonner"
 import { authClient, useSession } from "@/lib/auth-client"
+import Image from "next/image"
 
 // The user fields we need on this page
 type ProfileUser = {
@@ -20,10 +21,10 @@ type ProfileUser = {
 }
 
 export default function ProfilePage() {
-    // Current logged-in user
+
     const { data: session, isPending } = useSession()
 
-    // Loading state
+
     if (isPending) {
         return (
             <div className="w-full max-w-6xl mx-auto p-4 md:p-8 flex justify-center py-20">
@@ -38,7 +39,6 @@ export default function ProfilePage() {
 }
 
 function ProfileForm({ user }: { user: ProfileUser }) {
-    // Form state, filled with the current user values on first render
     const [name, setName] = useState(user.name || "")
     const [phone, setPhone] = useState(user.phone || "")
     const [image, setImage] = useState(user.image || "")
@@ -57,20 +57,16 @@ function ProfileForm({ user }: { user: ProfileUser }) {
             })
 
             if (error) {
-                toast.add({
-                    title: "Update failed",
-                    description: error.message || "Please try again.",
-                })
+                // ⬇️ সঠিক টোস্ট মেথড
+                toast.error(error.message || "Please try again.")
             } else {
-                toast.add({
-                    title: "Profile updated!",
+                toast.success("Profile updated!", {
                     description: "Your changes have been saved.",
                 })
             }
         } catch (err) {
             console.error("Update error:", err)
-            toast.add({
-                title: "Update failed",
+            toast.error("Update failed", {
                 description: "Something went wrong.",
             })
         } finally {
@@ -94,12 +90,14 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                 </CardHeader>
 
                 <CardContent>
-                    {/* Image preview based on the URL */}
+
                     <div className="mb-6 flex flex-col items-center gap-3">
                         {image ? (
-                            <img
+                            <Image
                                 src={image}
                                 alt="Profile preview"
+                                width={96}
+                                height={96}
                                 className="size-24 rounded-full border object-cover"
                             />
                         ) : (
@@ -111,7 +109,7 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Full Name (editable) */}
+
                         <div>
                             <label htmlFor="name" className="mb-1 flex items-center gap-1.5 text-sm font-medium">
                                 <User className="size-4" /> Full Name
@@ -124,7 +122,7 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                             />
                         </div>
 
-                        {/* Email (read-only) */}
+
                         <div>
                             <label htmlFor="email" className="mb-1 flex items-center gap-1.5 text-sm font-medium">
                                 <Mail className="size-4" /> Email
@@ -137,7 +135,7 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                             />
                         </div>
 
-                        {/* Phone (editable) */}
+
                         <div>
                             <label htmlFor="phone" className="mb-1 flex items-center gap-1.5 text-sm font-medium">
                                 <Phone className="size-4" /> Phone Number
@@ -151,7 +149,7 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                             />
                         </div>
 
-                        {/* Profile Image URL (editable) */}
+
                         <div>
                             <label htmlFor="image" className="mb-1 flex items-center gap-1.5 text-sm font-medium">
                                 <Camera className="size-4" /> Profile Image URL
@@ -165,12 +163,12 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                             />
                         </div>
 
-                        {/* Role (read-only) - ⬇️ এখানে সবসময় customer দেখাবে */}
+
                         <div>
                             <label htmlFor="role" className="mb-1 text-sm font-medium">Role</label>
                             <Input
                                 id="role"
-                                value="customer" // ⬅️ এখানে value="customer" করা হলো
+                                value="customer"
                                 readOnly
                                 className="text-muted-foreground"
                             />

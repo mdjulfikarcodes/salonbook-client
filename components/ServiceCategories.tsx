@@ -10,7 +10,6 @@ import {
   type LucideIcon,
 } from "lucide-react"
 
-// Static list of the 7 service categories + an icon for each
 const categories: { name: string; icon: LucideIcon }[] = [
   { name: "Haircut", icon: Scissors },
   { name: "Coloring", icon: Palette },
@@ -24,7 +23,7 @@ const categories: { name: string; icon: LucideIcon }[] = [
 // Category cards that link to the filtered browse page
 export default function ServiceCategories() {
   return (
-    <section className="w-full max-w-6xl mx-auto px-4 pb-14">
+    <section className="w-full max-w-6xl mx-auto px-4 pb-14 mt-8">
       <div>
         <h2 className="text-2xl font-bold md:text-3xl">Salon Service Categories</h2>
         <p className="mt-1 text-sm text-muted-foreground">

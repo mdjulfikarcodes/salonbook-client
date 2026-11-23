@@ -5,15 +5,12 @@ import { buttonVariants } from "@/components/ui/button"
 import { getServices } from "@/lib/api/services"
 import { cn } from "@/lib/utils"
 
-// Service + status field (backend sends status like "Active")
+// Service 
 type ServiceWithStatus = Service & { status?: string }
 
-// Shows up to 6 Active services on the home page
-export default async function FeaturedService() {
-  // Fetch all services from the API
-  const allServices: ServiceWithStatus[] = await getServices()
 
-  // Only Active services, max 6 items
+export default async function FeaturedService() {
+  const allServices: ServiceWithStatus[] = await getServices()
   const featuredServices = allServices
     .filter((service) => service.status === "Active")
     .slice(0, 6)

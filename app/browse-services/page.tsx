@@ -33,7 +33,7 @@ export default function BrowseServicesPage() {
     const [services, setServices] = useState<Service[]>([])
     const [loading, setLoading] = useState(true)
 
-    // ⬇️ ১. Debounce Search State
+    
     const [debouncedSearch, setDebouncedSearch] = useState("")
 
     useEffect(() => {
@@ -49,7 +49,7 @@ export default function BrowseServicesPage() {
 
         async function fetchServices() {
             const params = new URLSearchParams()
-            // ⬇️ এখানে debouncedSearch ব্যবহার করা হলো
+            
             if (debouncedSearch) params.set("search", debouncedSearch)
             if (category !== "All") params.set("category", category)
             if (sort !== "default") params.set("sort", sort)
@@ -85,7 +85,7 @@ export default function BrowseServicesPage() {
                 Find and book the perfect service for you.
             </p>
 
-            {/* Filter bar */}
+           
             <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center">
                 <div className="relative flex-1">
                     <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -122,7 +122,7 @@ export default function BrowseServicesPage() {
                 </Select>
             </div>
 
-            {/* Results grid */}
+           
             {loading ? (
            
                 <ServiceSkeleton />

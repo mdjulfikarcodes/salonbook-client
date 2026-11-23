@@ -8,10 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { authClient } from "@/lib/auth-client"
 
-// The backend server address (change it if your API runs elsewhere)
-const BASE_URL = process.env.API_BASE_URL || "http://localhost:5000"
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-// One row from any list API (we only need "status" for appointments)
+// One row from any list API 
 type Row = {
     status?: string
 }
@@ -26,13 +25,12 @@ type Stats = {
     payments: number
 }
 
-// Get the JWT token of the logged-in admin (client side)
 async function getToken() {
     const { data } = await authClient.token()
     return data?.token ?? null
 }
 
-// GET request with "Authorization: Bearer <token>" added
+
 async function fetchWithToken(path: string) {
     const token = await getToken()
 
@@ -47,7 +45,7 @@ async function fetchWithToken(path: string) {
     return res.json()
 }
 
-// APIs may send a plain array OR { users: [...] } OR { data: [...] } — handle all 3
+// APIs may send a plain array OR 
 function toArray(payload: unknown, key: string): Row[] {
     if (Array.isArray(payload)) return payload as Row[]
 
@@ -61,7 +59,7 @@ function toArray(payload: unknown, key: string): Row[] {
 }
 
 export default function AdminOverviewPage() {
-    const [stats, setStats] = useState<Stats | null>(null) // null = still loading
+    const [stats, setStats] = useState<Stats | null>(null) 
     const [failed, setFailed] = useState(false)
 
     useEffect(() => {
@@ -72,7 +70,7 @@ export default function AdminOverviewPage() {
                 // Fetch all endpoints at the same time
                 const [customersData, servicesData, appointmentsData, transactionsData] =
                     await Promise.all([
-                        fetchWithToken("/users/count"), // ⬅️ নতুন কাউন্ট API কল করা হলো
+                        fetchWithToken("/users/count"), 
                         fetchWithToken("/services"),
                         fetchWithToken("/admin/appointments"),
                         fetchWithToken("/admin/transactions"),
@@ -115,14 +113,14 @@ export default function AdminOverviewPage() {
                 </p>
             </div>
 
-            {/* Something went wrong */}
+            
             {failed && (
                 <p className="rounded-lg border border-dashed bg-muted/30 p-6 text-center text-sm text-red-500">
                     Could not load the stats. Please try again later.
                 </p>
             )}
 
-            {/* Loading: 6 pulsing skeleton cards */}
+        
             {!failed && stats === null && (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {[1, 2, 3, 4, 5, 6].map((n) => (
@@ -138,7 +136,7 @@ export default function AdminOverviewPage() {
                 </div>
             )}
 
-            {/* Loaded: the 6 stat cards */}
+       
             {stats !== null && (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {[

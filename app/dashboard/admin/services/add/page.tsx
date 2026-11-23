@@ -2,6 +2,7 @@
 
 import { useState, useEffect, type FormEvent } from "react"
 import { useRouter, useSearchParams } from "next/navigation" 
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -31,7 +32,6 @@ export default function AddEditServicePage() {
       if (!serviceId) return
       const data = await getServiceById(serviceId)
       if (data) {
-        // ⬇️ ডেটাবেসের সাথে মিল রেখে serviceName ব্যবহার করা হলো
         setName(data.serviceName || "") 
         setCategory(data.category || "")
         setDescription(data.description || "")
@@ -59,13 +59,16 @@ export default function AddEditServicePage() {
     try {
       if (isEditMode && serviceId) {
         await updateService(serviceId, formData) 
+        toast.success("Service updated successfully!")
       } else {
         await createService(formData)
+        toast.success("Service created successfully!")
       }
       router.push("/dashboard/admin/services") 
       router.refresh()
     } catch (error) {
       console.error(error)
+      toast.error("Failed to save service. Please try again.")
     } finally {
       setLoading(false)
     }

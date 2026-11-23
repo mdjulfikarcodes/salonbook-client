@@ -40,8 +40,8 @@ export default function RootLayout({
 
           <Footer />
 
-          {/* Sonner toast notifications */}
-          <Toaster richColors position="top-right" />
+        
+          <Toaster position="bottom-right" theme="dark" richColors />
         </ThemeProvider>
       </body>
     </html>

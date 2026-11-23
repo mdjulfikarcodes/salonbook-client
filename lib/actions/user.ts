@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 
-// Block (ban) a user — uses Better Auth admin plugin, not authClient
+
 export const blockUser = async (userId: string) => {
     try {
         await auth.api.banUser({
@@ -21,7 +21,6 @@ export const blockUser = async (userId: string) => {
     revalidatePath("/dashboard/admin/users")
 }
 
-// Unblock (unban) a user
 export const unblockUser = async (userId: string) => {
     try {
         await auth.api.unbanUser({

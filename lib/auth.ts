@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { admin, jwt } from "better-auth/plugins"
 
-// ⬇️ Vercel-এ বারবার কানেকশন তৈরি আটকাতে global ব্যবহার করা হলো
+
 
 const client =new MongoClient(process.env.BETTER_AUTH_DB_URI as string);
 

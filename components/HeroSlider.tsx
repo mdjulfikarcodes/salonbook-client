@@ -27,21 +27,21 @@ const slides: Slide[] = [
     title: "Book Your Perfect Salon Experience",
     subtitle: "Explore top-rated salons and book instantly — anytime, anywhere.",
     ctaText: "Explore Salon Services",
-    ctaLink: "/services",
+    ctaLink: "/browse-services",
   },
   {
     image: "/assets/hero2.jpg",
     title: "Premium Hair & Beauty Care",
     subtitle: "Trusted professionals, quality service, and secure online payment.",
     ctaText: "Explore Salon Services",
-    ctaLink: "/services",
+    ctaLink: "/browse-services",
   },
   {
     image: "/assets/hero3.jpg",
     title: "Your Beauty, Your Schedule",
     subtitle: "Choose your service, pick a time slot, and pay securely with Stripe.",
     ctaText: "Explore Salon Services",
-    ctaLink: "/services",
+    ctaLink: "/browse-services",
   },
 ]
 

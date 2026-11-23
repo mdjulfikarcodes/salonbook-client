@@ -3,13 +3,14 @@
 import { useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import { Camera, Mail, Phone, User } from "lucide-react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { authClient, useSession } from "@/lib/auth-client"
+import Image from "next/image"
 
-// The user fields we need on this page
 type ProfileUser = {
     id: string
     name?: string | null
@@ -18,14 +19,7 @@ type ProfileUser = {
     phone?: string | null
 }
 
-// Success or error message shown inside the form
-type Message = {
-    type: "success" | "error"
-    text: string
-} | null
-
 export default function AdminProfilePage() {
-    // Current logged-in admin
     const { data: session, isPending } = useSession()
 
     // Loading state
@@ -45,18 +39,16 @@ export default function AdminProfilePage() {
 function ProfileForm({ user }: { user: ProfileUser }) {
     const router = useRouter()
 
-    // Form state, filled with the current user values on first render
+    // Form state
     const [name, setName] = useState(user.name || "")
     const [phone, setPhone] = useState(user.phone || "")
     const [image, setImage] = useState(user.image || "")
     const [saving, setSaving] = useState(false)
-    const [message, setMessage] = useState<Message>(null)
 
-    // Save the updated profile (role and blocked status are never sent)
+    // Save the updated profile
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault()
         setSaving(true)
-        setMessage(null)
 
         try {
             const { error } = await authClient.updateUser({
@@ -66,23 +58,14 @@ function ProfileForm({ user }: { user: ProfileUser }) {
             })
 
             if (error) {
-                setMessage({
-                    type: "error",
-                    text: error.message || "Could not update the profile. Please try again.",
-                })
+                toast.error(error.message || "Could not update the profile. Please try again.")
             } else {
-                setMessage({
-                    type: "success",
-                    text: "Profile updated successfully!",
-                })
+                toast.success("Profile updated successfully!")
                 router.refresh()
             }
         } catch (err) {
             console.error("Update error:", err)
-            setMessage({
-                type: "error",
-                text: "Something went wrong. Please try again.",
-            })
+            toast.error("Something went wrong. Please try again.")
         } finally {
             setSaving(false)
         }
@@ -104,15 +87,17 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                 </CardHeader>
 
                 <CardContent>
-                    {/* Profile image preview (updates while typing a new URL) */}
-                    <img
+                    {/* Profile image preview */}
+                    <Image
                         src={image || "https://github.com/shadcn.png"}
                         alt="Profile"
+                        width={96}
+                        height={96}
                         className="w-24 h-24 rounded-full object-cover border-2 border-rose-500 mx-auto mb-6"
                     />
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Full Name (editable) */}
+                        {/* Full Name */}
                         <div>
                             <label htmlFor="name" className="mb-1 flex items-center gap-1.5 text-sm font-medium">
                                 <User className="size-4" /> Name
@@ -125,7 +110,7 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                             />
                         </div>
 
-                        {/* Email (disabled, cannot be changed) */}
+                        {/* Email */}
                         <div>
                             <label htmlFor="email" className="mb-1 flex items-center gap-1.5 text-sm font-medium">
                                 <Mail className="size-4" /> Email
@@ -138,7 +123,7 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                             />
                         </div>
 
-                        {/* Phone (editable) */}
+                        {/* Phone */}
                         <div>
                             <label htmlFor="phone" className="mb-1 flex items-center gap-1.5 text-sm font-medium">
                                 <Phone className="size-4" /> Phone
@@ -152,7 +137,7 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                             />
                         </div>
 
-                        {/* Profile Image URL (editable) */}
+                        {/* Profile Image URL */}
                         <div>
                             <label htmlFor="image" className="mb-1 flex items-center gap-1.5 text-sm font-medium">
                                 <Camera className="size-4" /> Profile Image URL
@@ -165,19 +150,6 @@ function ProfileForm({ user }: { user: ProfileUser }) {
                                 placeholder="https://example.com/photo.jpg"
                             />
                         </div>
-
-                        {/* Success / error message (no alerts) */}
-                        {message && (
-                            <p
-                                className={
-                                    message.type === "success"
-                                        ? "rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-400"
-                                        : "rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600 dark:border-red-900 dark:bg-red-950 dark:text-red-400"
-                                }
-                            >
-                                {message.text}
-                            </p>
-                        )}
 
                         <Button
                             type="submit"
