@@ -1,73 +1,35 @@
-"use client";
+import dns from 'node:dns';
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+import type { ReactNode } from "react"
 
-import { useEffect } from "react"
-import { usePathname, useRouter } from "next/navigation"
+import {
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
 
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { DashboardSidebar } from "../components/DashboardSidebar"
-import { Toaster } from "@/components/ui/toast";
-import { useSession } from "@/lib/auth-client"
+import { Toaster } from "@/components/ui/toast"
 
-
-function CheckingPermissions() {
-    return (
-        <div className="flex min-h-[70vh] items-center justify-center">
-            <p className="animate-pulse text-muted-foreground">Checking permissions...</p>
-        </div>
-    )
-}
-
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-    const router = useRouter()
-    const pathname = usePathname()
-    const { data: session, isPending } = useSession()
-
-    const role = session?.user?.role
-    const isAdminPath = pathname.startsWith("/dashboard/admin")
-    const isCustomerPath = pathname.startsWith("/dashboard/customer")
-
-   
-    useEffect(() => {
-        if (isPending) return
-
-      
-        if (!session) {
-            router.push("/sign-in")
-            return
-        }
-
-        
-        if (role === "admin" && isCustomerPath) {
-            router.push("/dashboard/admin")
-            return
-        }
-
-        
-        if (role === "customer" && isAdminPath) {
-            router.push("/dashboard/customer")
-        }
-    }, [isPending, session, role, isAdminPath, isCustomerPath, router])
-
-    
-    if (isPending) return <CheckingPermissions />
-
-    
-    const roleMatches =
-        session !== null &&
-        !((role === "admin" && isCustomerPath) || (role === "customer" && isAdminPath))
-
-    if (!roleMatches) return <CheckingPermissions />
-
-    return (
+export default function DashboardLayout({
+  children,
+}: {
+  children: ReactNode
+}) {
+  return (
     <SidebarProvider>
-      <DashboardSidebar/>
-      <main className="w-full">
-        <SidebarTrigger />
-        {children}
-      </main>
+      <DashboardSidebar />
+
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+        <div className="flex items-center border-b px-4 py-2">
+          <SidebarTrigger />
+        </div>
+
+        <main className="min-w-0 flex-1">
+          {children}
+        </main>
+      </div>
+
       <Toaster />
     </SidebarProvider>
   )
-};
-
-export default DashboardLayout;
+}

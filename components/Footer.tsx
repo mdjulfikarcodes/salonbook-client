@@ -1,11 +1,19 @@
+
 import Link from "next/link"
 import { Clock, Mail, MapPin, Phone, Scissors } from "lucide-react"
 
-type IconProps = { className?: string }
+type IconProps = {
+  className?: string
+}
 
 function FacebookIcon({ className }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
       <path d="M13.5 21v-7h2.4l.4-3h-2.8V9.1c0-.9.2-1.5 1.5-1.5h1.4V5c-.2 0-1-.1-1.9-.1-1.9 0-3.3 1.2-3.3 3.4V11H8.8v3h2.4v7h2.3Z" />
     </svg>
   )
@@ -32,7 +40,12 @@ function InstagramIcon({ className }: IconProps) {
 
 function XIcon({ className }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
       <path d="M17.7 4h2.7l-6 6.9L21.5 20h-5.5l-4.3-5.6L6.7 20H4l6.5-7.4L3.9 4h5.6l3.9 5.2L17.7 4Zm-1 14.3h1.5L8.5 5.6H6.9l9.8 12.7Z" />
     </svg>
   )
@@ -53,8 +66,10 @@ const socials = [
 
 export default function Footer() {
   return (
-    <footer className="bg-ink text-zinc-300">
+    <footer className="w-full shrink-0 bg-ink text-zinc-300">
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-12 md:grid-cols-2 lg:grid-cols-4">
+
+        {/* Brand */}
         <div>
           <Link
             href="/"
@@ -65,15 +80,18 @@ export default function Footer() {
             </span>
             SalonBook
           </Link>
+
           <p className="mt-3 text-sm leading-relaxed text-zinc-400">
             Book your favorite salon services anytime, anywhere.
           </p>
         </div>
 
+        {/* Quick Links */}
         <div>
           <h3 className="text-sm font-semibold tracking-wide text-gold uppercase">
             Quick Links
           </h3>
+
           <ul className="mt-3 space-y-2">
             {quickLinks.map((link) => (
               <li key={link.href}>
@@ -88,10 +106,12 @@ export default function Footer() {
           </ul>
         </div>
 
+        {/* Contact */}
         <div>
           <h3 className="text-sm font-semibold tracking-wide text-gold uppercase">
             Contact
           </h3>
+
           <ul className="mt-3 space-y-2 text-sm">
             <li className="flex items-center gap-2">
               <Phone className="size-4 shrink-0 text-gold" />
@@ -102,6 +122,7 @@ export default function Footer() {
                 +880 1234 56789
               </a>
             </li>
+
             <li className="flex items-center gap-2">
               <Mail className="size-4 shrink-0 text-gold" />
               <a
@@ -114,20 +135,24 @@ export default function Footer() {
           </ul>
         </div>
 
+        {/* Visit Us */}
         <div>
           <h3 className="text-sm font-semibold tracking-wide text-gold uppercase">
             Visit Us
           </h3>
+
           <ul className="mt-3 space-y-2 text-sm">
             <li className="flex items-start gap-2">
               <MapPin className="mt-0.5 size-4 shrink-0 text-gold" />
               <span>123 Gulshan Avenue, Dhaka</span>
             </li>
+
             <li className="flex items-start gap-2">
               <Clock className="mt-0.5 size-4 shrink-0 text-gold" />
               <span>Sat–Thu: 10AM–8PM</span>
             </li>
           </ul>
+
           <div className="mt-4 flex items-center gap-2">
             {socials.map((social) => (
               <a
@@ -145,7 +170,7 @@ export default function Footer() {
 
       <div className="border-t border-gold/25">
         <p className="mx-auto max-w-6xl px-4 py-4 text-center text-xs text-zinc-500">
-          © 2025 SalonBook. All rights reserved.
+          © {new Date().getFullYear()} SalonBook. All rights reserved.
         </p>
       </div>
     </footer>
