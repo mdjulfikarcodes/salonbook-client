@@ -14,6 +14,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  trustedOrigins:["https://salonbook-client-weld-ten.vercel.app", "http://localhost:3000"],
   user: {
     additionalFields: {
       role: {
